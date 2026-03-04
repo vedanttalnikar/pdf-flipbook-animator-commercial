@@ -128,16 +128,15 @@ class FlipbookGenerator:
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>{title}</h1>
-            <div class="header-controls">
-                {'<button id="fullscreen-btn" class="control-btn" title="Fullscreen (F)">⛶</button>' if self.config.enable_fullscreen else ''}
-                <span class="page-indicator">
-                    Page <span id="current-page">1</span> of <span id="total-pages">{page_count}</span>
-                </span>
-            </div>
-        </header>
+        <!-- Left Panel: Previous Navigation -->
+        <aside class="left-panel">
+            <button id="prev-btn" class="side-nav-btn" title="Previous Page (← or ↑)">
+                <span class="arrow">←</span>
+                <span class="label">Previous</span>
+            </button>
+        </aside>
 
+        <!-- Center: Full-height Flipbook -->
         <main class="main">
             <div id="flipbook" class="flipbook">
 {images_html}
@@ -149,22 +148,36 @@ class FlipbookGenerator:
             </div>
         </main>
 
-        <nav class="controls">
-            <button id="prev-btn" class="nav-btn" title="Previous (←)">
-                <span>←</span> Previous
-            </button>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress"></div>
+        <!-- Right Panel: Next Navigation & Info -->
+        <aside class="right-panel">
+            <div class="panel-header">
+                <h1 class="title">{title}</h1>
+                {'<button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen (F)">⛶</button>' if self.config.enable_fullscreen else ''}
             </div>
-            <button id="next-btn" class="nav-btn" title="Next (→)">
-                Next <span>→</span>
+            
+            <div class="page-info">
+                <span class="page-indicator">
+                    <span id="current-page">1</span> / <span id="total-pages">{page_count}</span>
+                </span>
+            </div>
+            
+            <button id="next-btn" class="side-nav-btn" title="Next Page (→ or ↓)">
+                <span class="label">Next</span>
+                <span class="arrow">→</span>
             </button>
-        </nav>
-
-        <footer class="footer">
-            <p>Use arrow keys to navigate • Click pages to flip • Press F for fullscreen</p>
-            <p class="credit">Powered by <a href="https://github.com/yourusername/pdf-flipbook-animator" target="_blank">PDF Flipbook Animator</a></p>
-        </footer>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+            </div>
+            
+            <div class="help-text">
+                <p>🎯 Click or drag pages</p>
+                <p>⌨️ Arrow keys to navigate</p>
+                <p>🖱️ Press F for fullscreen</p>
+            </div>
+        </aside>
     </div>
 
     <script src="js/flipbook.js"></script>
@@ -175,7 +188,7 @@ class FlipbookGenerator:
 
     def _generate_css(self) -> str:
         """Generate CSS stylesheet."""
-        css = f"""/* PDF Flipbook Animator Styles */
+        css = f"""/* PDF Flipbook Animator Styles - Fully Responsive */
 
 :root {{
     --primary-color: {self.config.primary_color};
@@ -197,83 +210,110 @@ body {{
     background: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    overflow-x: hidden;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }}
 
 .container {{
-    max-width: 1920px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+}}
+
+/* Side Panels Layout */
+.left-panel,
+.right-panel {{
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-}}
-
-/* Header */
-.header {{
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
-    border-bottom: 2px solid var(--border-color);
-    margin-bottom: 30px;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.98);
+    border-right: 1px solid var(--border-color);
+    padding: 15px 10px;
+    gap: 20px;
 }}
 
-.header h1 {{
-    font-size: 2rem;
+.left-panel {{
+    width: 80px;
+    border-right: 1px solid var(--border-color);
+}}
+
+.right-panel {{
+    width: 180px;
+    border-left: 1px solid var(--border-color);
+    border-right: none;
+    justify-content: flex-start;
+    padding: 20px 15px;
+}}
+
+/* Panel Header */
+.panel-header {{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary-color);
+}}
+
+.panel-header .title {{
+    font-size: 0.95rem;
     color: var(--primary-color);
-    font-weight: 600;
+    font-weight: 700;
+    text-align: center;
+    margin: 0;
+    line-height: 1.3;
+    word-break: break-word;
 }}
 
-.header-controls {{
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}}
-
-.control-btn {{
+.icon-btn {{
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+    padding: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     transition: var(--transition);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }}
 
-.control-btn:hover {{
-    opacity: 0.8;
+.icon-btn:hover {{
+    background: color-mix(in srgb, var(--primary-color) 85%, black);
     transform: scale(1.05);
 }}
 
-.page-indicator {{
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text-color);
-    background: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    box-shadow: var(--shadow);
-}}
-
-/* Main Content */
+/* Main Content - Full Height */
 .main {{
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    padding: 20px 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    perspective: 2400px;
+    perspective-origin: center center;
+    overflow: hidden;
 }}
 
 .flipbook {{
-    max-width: 100%;
-    max-height: 80vh;
-    min-height: 400px;
+    width: 100%;
+    height: 100%;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    overflow: hidden;
+    overflow: visible;
     background: white;
     position: relative;
 }}
@@ -297,9 +337,14 @@ body {{
 
 .page img {{
     max-width: 100%;
-    max-height: 80vh;
+    max-height: 100%;
+    width: auto;
+    height: auto;
     object-fit: contain;
     display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
 }}
 
 /* Loading Spinner */
@@ -331,29 +376,30 @@ body {{
     100% {{ transform: rotate(360deg); }}
 }}
 
-/* Controls */
+/* Controls - Compact */
 .controls {{
+    flex-shrink: 0;
     display: flex;
-    gap: 20px;
+    gap: 15px;
     align-items: center;
     justify-content: center;
-    padding: 30px 0;
-    margin-top: auto;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.95);
 }}
 
 .nav-btn {{
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 15px 30px;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
     transition: var(--transition);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
 }}
 
 .nav-btn:hover:not(:disabled) {{
@@ -367,9 +413,28 @@ body {{
     cursor: not-allowed;
 }}
 
+/* Page Info */
+.page-info {{
+    text-align: center;
+    width: 100%;
+    padding: 15px 0;
+}}
+
+.page-indicator {{
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: block;
+}}
+
+/* Progress Bar */
+.progress-container {{
+    width: 100%;
+    padding: 15px 0;
+}}
+
 .progress-bar {{
-    flex: 1;
-    max-width: 400px;
+    width: 100%;
     height: 8px;
     background: #e0e0e0;
     border-radius: 4px;
@@ -383,35 +448,103 @@ body {{
     border-radius: 4px;
 }}
 
-/* Footer */
-.footer {{
+/* Help Text */
+.help-text {{
+    margin-top: auto;
+    padding-top: 20px;
     text-align: center;
-    padding: 20px 0;
-    border-top: 2px solid var(--border-color);
-    margin-top: 20px;
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    border-top: 1px solid var(--border-color);
 }}
 
-.footer p {{
-    margin: 5px 0;
+.help-text p {{
+    margin: 4px 0;
 }}
 
-.footer a {{
-    color: var(--primary-color);
-    text-decoration: none;
+/* Responsive Design with Dynamic Perspective */
+
+/* Mobile: Compact side panels */
+@media (max-width: 767px) {{
+    .main {{
+        perspective: 1200px;
+    }}
+    
+    .left-panel {{
+        width: 50px;
+        padding: 10px 5px;
+    }}
+    
+    .right-panel {{
+        width: 60px;
+        padding: 10px 5px;
+        gap: 10px;
+    }}
+    
+    .panel-header .title {{
+        font-size: 0.65rem;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+    }}
+    
+    .side-nav-btn {{
+        min-height: 60px;
+        padding: 10px 5px;
+        font-size: 0.7rem;
+    }}
+    
+    .side-nav-btn .arrow {{
+        font-size: 1.3rem;
+    }}
+    
+    .side-nav-btn .label {{
+        display: none;
+    }}
+    
+    .page-indicator {{
+        font-size: 0.75rem;
+        writing-mode: vertical-rl;
+    }}
+    
+    .help-text {{
+        display: none;
+    }}
+    
+    .icon-btn {{
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+        padding: 5px;
+    }}
 }}
 
-.footer a:hover {{
-    text-decoration: underline;
+/* Tablet: Adjusted side panels */
+@media (min-width: 768px) and (max-width: 1023px) {{
+    .main {{
+        perspective: 1800px;
+    }}
+    
+    .left-panel {{
+        width: 70px;
+    }}
+    
+    .right-panel {{
+        width: 140px;
+    }}
+    
+    .panel-header .title {{
+        font-size: 0.85rem;
+    }}
 }}
 
-/* Responsive Design */
-
-/* Two-page spread for desktop */
+/* Desktop: Two-page spread, full perspective */
 @media (min-width: 1024px) {{
+    .main {{
+        perspective: 2400px;
+    }}
+
     .flipbook {{
-        max-width: 1400px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -426,7 +559,6 @@ body {{
     .page img {{
         width: 100%;
         height: auto;
-        max-height: 80vh;
     }}
 
     /* Book spine shadow effect between pages */
@@ -439,73 +571,58 @@ body {{
     }}
 }}
 
-/* Single page for mobile/tablet */
-@media (max-width: 1023px) {{
-    .flipbook {{
-        max-width: 100%;
-        display: block;
-    }}
-
-    .page {{
-        max-width: 100%;
-        width: 100%;
-        position: absolute !important;
-    }}
-}}
-
-@media (max-width: 768px) {{
-    .header {{
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }}
-
-    .header h1 {{
-        font-size: 1.5rem;
-    }}
-
-    .controls {{
-        flex-direction: column;
-        gap: 15px;
-    }}
-
-    .progress-bar {{
-        width: 100%;
-        max-width: none;
-    }}
-
-    .nav-btn {{
-        width: 100%;
-        justify-content: center;
-    }}
-
-    .page img {{
-        max-height: 60vh;
-    }}
-}}
-
+/* Extra small mobile devices */
 @media (max-width: 480px) {{
-    .container {{
-        padding: 10px;
+    .left-panel {{
+        width: 40px;
+        padding: 8px 3px;
     }}
-
-    .header h1 {{
-        font-size: 1.2rem;
+    
+    .right-panel {{
+        width: 50px;
+        padding: 8px 3px;
     }}
-
-    .page-indicator {{
-        font-size: 0.9rem;
-        padding: 8px 15px;
+    
+    .side-nav-btn {{
+        min-height: 50px;
+        padding: 8px 3px;
+    }}
+    
+    .side-nav-btn .arrow {{
+        font-size: 1.1rem;
     }}
 }}
 
-/* Fullscreen Mode */
+/* Fullscreen Mode - Semi-transparent side panels */
 .container:fullscreen {{
     background: var(--bg-color);
+    width: 100vw;
+    height: 100vh;
 }}
 
-.container:fullscreen .page img {{
-    max-height: 95vh;
+.container:fullscreen .left-panel,
+.container:fullscreen .right-panel {{
+    background: rgba(255, 255, 255, 0.85);
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}}
+
+.container:fullscreen .left-panel:hover,
+.container:fullscreen .right-panel:hover {{
+    opacity: 1;
+}}
+
+.container:fullscreen .help-text {{
+    opacity: 0.6;
+}}
+
+.container:fullscreen .main {{
+    height: 100vh;
+}}
+
+.container:fullscreen .flipbook {{
+    width: 100%;
+    height: 100%;
 }}
 
 /* Dark Mode Support */

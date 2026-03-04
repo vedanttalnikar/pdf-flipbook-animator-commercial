@@ -8,6 +8,10 @@ class Flipbook {
         this.pageFlip = null;
         this.images = [];
         this.isInitialized = false;
+        this.isResizing = false;
+        this.resizeTimeout = null;
+        this.aspectRatio = null;
+        this.isMobileMode = false; // Track if in mobile (single-page) mode
         
         // Collect all image paths
         document.querySelectorAll('.page img').forEach(img => {
@@ -38,16 +42,150 @@ class Flipbook {
         document.head.appendChild(script);
     }
 
+    calculateResponsiveDimensions(aspectRatio) {
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const isMobile = screenWidth < 768;
+        const isTablet = screenWidth >= 768 && screenWidth < 1024;
+        const isDesktop = screenWidth >= 1024;
+
+        // Side panels take horizontal space, full vertical height available
+        let sidePanelWidth = 260; // 80px left + 180px right
+        if (isMobile) sidePanelWidth = 110; // 50px + 60px
+        else if (isTablet) sidePanelWidth = 210; // 70px + 140px
+        
+        const availableHeight = screenHeight - 10; // Almost full height!
+        const availableWidth = screenWidth - sidePanelWidth - 20;
+
+        let pageWidth, pageHeight;
+
+        if (isMobile) {
+            // Mobile: single page, 95% width
+            pageWidth = Math.floor(availableWidth * 0.95);
+            pageHeight = Math.floor(pageWidth / aspectRatio);
+            
+            if (pageHeight > availableHeight) {
+                pageHeight = Math.floor(availableHeight);
+                pageWidth = Math.floor(pageHeight * aspectRatio);
+            }
+        } else if (isTablet) {
+            // Tablet: single page, 90% width
+            pageWidth = Math.floor(availableWidth * 0.9);
+            pageHeight = Math.floor(pageWidth / aspectRatio);
+            
+            if (pageHeight > availableHeight) {
+                pageHeight = Math.floor(availableHeight);
+                pageWidth = Math.floor(pageHeight * aspectRatio);
+            }
+        } else {
+            // Desktop: two-page spread
+            pageWidth = Math.floor(availableWidth / 2.05); // Account for gap
+            pageHeight = Math.floor(pageWidth / aspectRatio);
+            
+            if (pageHeight > availableHeight) {
+                pageHeight = Math.floor(availableHeight);
+                pageWidth = Math.floor(pageHeight * aspectRatio);
+            }
+        }
+
+        console.log(`📱 Responsive dimensions calculated:`);
+        console.log(`  Screen: ${screenWidth}x${screenHeight}`);
+        console.log(`  Mode: ${isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop'}`);
+        console.log(`  Page: ${pageWidth}x${pageHeight}`);
+        console.log(`  Available: ${availableWidth}x${availableHeight}`);
+
+        return {
+            pageWidth,
+            pageHeight,
+            isMobile,
+            isTablet,
+            isDesktop
+        };
+    }
+
+    setupResponsiveResize() {
+        const handleResize = () => {
+            if (this.isResizing) return;
+            
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => {
+                console.log('🔄 Window resized, reinitializing flipbook...');
+                this.reinitialize();
+            }, 300);
+        };
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                console.log('🔄 Orientation changed, reinitializing flipbook...');
+                this.reinitialize();
+            }, 100);
+        });
+    }
+
+    reinitialize() {
+        if (!this.aspectRatio) return;
+        
+        this.isResizing = true;
+        
+        // Save current page
+        const savedPage = this.currentPage;
+        
+        // Destroy existing pageFlip
+        if (this.pageFlip) {
+            try {
+                this.pageFlip.destroy();
+            } catch (e) {
+                console.warn('Error destroying pageFlip:', e);
+            }
+            this.pageFlip = null;
+        }
+        
+        // Mark as not initialized
+        this.isInitialized = false;
+        
+        // Reinitialize with new dimensions
+        setTimeout(() => {
+            this.initializeFlipbook(this.aspectRatio, savedPage - 1);
+            this.isResizing = false;
+        }, 100);
+    }
+
     init() {
         if (this.isInitialized) return;
         
+        // Load first image to get aspect ratio
+        const firstImg = new Image();
+        firstImg.src = this.images[0];
+        
+        firstImg.onload = () => {
+            // Get natural image dimensions
+            const naturalWidth = firstImg.naturalWidth;
+            const naturalHeight = firstImg.naturalHeight;
+            this.aspectRatio = naturalWidth / naturalHeight;
+            
+            console.log(`📄 Original page dimensions: ${naturalWidth}x${naturalHeight}, aspect ratio: ${this.aspectRatio.toFixed(2)}`);
+            
+            this.initializeFlipbook(this.aspectRatio, 0);
+            this.setupResponsiveResize();
+        };
+        
+        firstImg.onerror = () => {
+            console.error('Failed to load first image, falling back to simple mode');
+            this.fallbackToSimpleMode();
+        };
+    }
+
+    initializeFlipbook(aspectRatio, startPage = 0) {
         // Hide original pages
         document.querySelectorAll('.page').forEach(page => {
             page.style.display = 'none';
         });
 
         // Create new container for StPageFlip
-        const viewer = document.getElementById('flipbook-viewer');
+        const viewer = document.getElementById('flipbook');
+        
+        // Clear the container
         viewer.innerHTML = '';
         
         const flipbookContainer = document.createElement('div');
@@ -55,31 +193,32 @@ class Flipbook {
         flipbookContainer.style.cssText = 'width: 100%; height: 100%;';
         viewer.appendChild(flipbookContainer);
 
-        // Calculate dimensions
-        const viewerWidth = viewer.clientWidth;
-        const viewerHeight = viewer.clientHeight;
-        const pageWidth = Math.min(viewerWidth / 2, 600);
-        const pageHeight = Math.min(viewerHeight, 800);
+        // Calculate responsive dimensions
+        const dimensions = this.calculateResponsiveDimensions(aspectRatio);
+        
+        // Store mobile mode state for navigation
+        this.isMobileMode = dimensions.isMobile;
 
         try {
-            // Initialize StPageFlip
+            // Initialize StPageFlip with responsive dimensions
             this.pageFlip = new St.PageFlip(flipbookContainer, {
-                width: pageWidth,
-                height: pageHeight,
-                size: 'stretch',
+                width: dimensions.pageWidth,
+                height: dimensions.pageHeight,
+                size: 'fixed',
                 minWidth: 315,
-                maxWidth: 1000,
+                maxWidth: 2000,
                 minHeight: 400,
-                maxHeight: 1533,
-                maxShadowOpacity: 0.5,
-                showCover: true,
+                maxHeight: 3000,
+                maxShadowOpacity: 0.6,
+                showCover: !dimensions.isMobile, // No cover on mobile
                 mobileScrollSupport: true,
-                swipeDistance: 30,
+                swipeDistance: 50,
                 clickEventForward: true,
                 usePortrait: true,
-                startPage: 0,
+                startPage: startPage,
+                startZIndex: 0,
                 drawShadow: true,
-                flippingTime: 800,
+                flippingTime: 1000,
                 useMouseEvents: true,
                 autoSize: true,
                 showPageCorners: true,
@@ -89,13 +228,21 @@ class Flipbook {
             // Load pages as HTML elements
             this.pageFlip.loadFromImages(this.images);
 
-            // Setup event listeners
-            this.setupPageFlipEvents();
-            this.setupControls();
-            this.setupKeyboard();
+            // Setup event listeners (only once)
+            if (!this.isInitialized) {
+                this.setupPageFlipEvents();
+                this.setupControls();
+                this.setupKeyboard();
+            }
             
-            // Restore saved position
-            this.restorePosition();
+            // Restore saved position (only on first init)
+            if (!this.isInitialized) {
+                this.restorePosition();
+            } else {
+                // Just update the page
+                this.currentPage = startPage + 1;
+                this.updateUI();
+            }
 
             this.isInitialized = true;
 
@@ -105,7 +252,7 @@ class Flipbook {
                 loading.classList.remove('show');
             }
 
-            console.log(`Flipbook initialized with ${this.totalPages} pages (Realistic mode with StPageFlip)`);
+            console.log(`✅ Flipbook initialized with ${this.totalPages} pages (Fully Responsive Realistic mode)`);
         } catch (error) {
             console.error('Error initializing StPageFlip:', error);
             this.fallbackToSimpleMode();
@@ -183,14 +330,44 @@ class Flipbook {
     }
 
     nextPage() {
-        if (this.pageFlip) {
-            this.pageFlip.flipNext();
+        if (!this.pageFlip) return;
+        
+        try {
+            // Get the actual current page index from StPageFlip (0-based)
+            const currentIndex = this.pageFlip.getCurrentPageIndex();
+            
+            // In two-page spread mode (desktop/tablet), we need to skip by 2
+            // In single-page mode (mobile), we skip by 1
+            const increment = this.isMobileMode ? 1 : 2;
+            const nextIndex = currentIndex + increment;
+            
+            // Check if we can move forward
+            if (nextIndex < this.totalPages) {
+                this.pageFlip.flip(nextIndex);
+            }
+        } catch (e) {
+            console.warn('Error in nextPage:', e);
         }
     }
 
     previousPage() {
-        if (this.pageFlip) {
-            this.pageFlip.flipPrev();
+        if (!this.pageFlip) return;
+        
+        try {
+            // Get the actual current page index from StPageFlip (0-based)
+            const currentIndex = this.pageFlip.getCurrentPageIndex();
+            
+            // In two-page spread mode (desktop/tablet), we need to skip by 2
+            // In single-page mode (mobile), we skip by 1
+            const decrement = this.isMobileMode ? 1 : 2;
+            const prevIndex = currentIndex - decrement;
+            
+            // Check if we can move backward
+            if (prevIndex >= 0) {
+                this.pageFlip.flip(prevIndex);
+            }
+        } catch (e) {
+            console.warn('Error in previousPage:', e);
         }
     }
 

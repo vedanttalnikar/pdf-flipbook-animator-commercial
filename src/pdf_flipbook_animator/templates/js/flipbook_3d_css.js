@@ -78,21 +78,21 @@ class Flipbook {
         if (viewer) {
             viewer.style.perspective = '2000px';
             viewer.style.perspectiveOrigin = 'center center';
-            viewer.style.overflow = 'hidden'; // Prevent page visibility below
+            viewer.style.overflow = 'hidden';
         }
 
         const flipbook = document.getElementById('flipbook');
         if (flipbook) {
+            flipbook.style.position = 'relative';
+            flipbook.style.overflow = 'hidden';
+            
             if (this.spreadMode) {
-                flipbook.style.position = 'relative';
-                flipbook.style.overflow = 'hidden';
+                // Flex layout for spread mode
                 flipbook.style.display = 'flex';
                 flipbook.style.justifyContent = 'center';
                 flipbook.style.alignItems = 'center';
                 flipbook.style.gap = '0';
             } else {
-                flipbook.style.position = 'relative';
-                flipbook.style.overflow = 'hidden';
                 flipbook.style.display = 'block';
             }
         }
@@ -252,43 +252,125 @@ class Flipbook {
     }
 
     showSpread(pageNum) {
-        // In spread mode, show two pages side-by-side
-        // Ensure we start on an odd page (left page)
+        // In spread mode, show two pages side-by-side with smooth cross-fade
         const leftPageNum = pageNum % 2 === 0 ? pageNum - 1 : pageNum;
         const rightPageNum = leftPageNum + 1;
         
+        const oldCurrentPage = this.currentPage;
+        const oldLeftPageNum = oldCurrentPage % 2 === 0 ? oldCurrentPage - 1 : oldCurrentPage;
+        
+        // Update current page immediately
         this.currentPage = pageNum;
         
-        // Hide all pages
+        // If same spread or first load, just show without animation
+        if (leftPageNum === oldLeftPageNum || !oldCurrentPage || oldCurrentPage === pageNum) {
+            // Hide all pages
+            this.pages.forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+                page.style.opacity = '1';
+                page.style.transition = '';
+            });
+            
+            // Show left page
+            if (leftPageNum >= 1 && leftPageNum <= this.totalPages) {
+                const leftPage = this.pages[leftPageNum - 1];
+                leftPage.style.display = 'flex';
+                leftPage.classList.add('active');
+            }
+            
+            // Show right page
+            if (rightPageNum <= this.totalPages) {
+                const rightPage = this.pages[rightPageNum - 1];
+                rightPage.style.display = 'flex';
+                rightPage.classList.add('active');
+            }
+            
+            this.preloadPages(pageNum);
+            this.savePosition();
+            this.updateUI();
+            return;
+        }
+        
+        if (this.isAnimating) return;
+        this.isAnimating = true;
+        
+        const duration = 300;
+        const flipbook = document.getElementById('flipbook');
+        
+        // Get new pages references
+        const newLeftPage = this.pages[leftPageNum - 1];
+        const newRightPage = rightPageNum <= this.totalPages ? this.pages[rightPageNum - 1] : null;
+        
+        // Position new pages absolutely on top to avoid expansion
+        if (newLeftPage) {
+            newLeftPage.style.position = 'absolute';
+            newLeftPage.style.top = '0';
+            newLeftPage.style.left = '0';
+            newLeftPage.style.display = 'flex';
+            newLeftPage.style.opacity = '0';
+        }
+        if (newRightPage) {
+            newRightPage.style.position = 'absolute';
+            newRightPage.style.top = '0';
+            newRightPage.style.left = '50%';
+            newRightPage.style.display = 'flex';
+            newRightPage.style.opacity = '0';
+        }
+        
+        // Trigger reflow
+        if (newLeftPage) newLeftPage.offsetHeight;
+        
+        // Cross-fade: old fade out, new fade in simultaneously
         this.pages.forEach(page => {
-            page.classList.remove('active');
-            page.style.display = 'none';
-            page.style.transform = '';
-            page.style.zIndex = '0';
+            if (page.classList.contains('active')) {
+                page.style.transition = `opacity ${duration}ms ease`;
+                page.style.opacity = '0';
+            }
         });
         
-        // Show left page
-        if (leftPageNum >= 1 && leftPageNum <= this.totalPages) {
-            const leftPage = this.pages[leftPageNum - 1];
-            leftPage.style.display = 'flex';
-            leftPage.classList.add('active');
+        if (newLeftPage) {
+            newLeftPage.style.transition = `opacity ${duration}ms ease`;
+            newLeftPage.style.opacity = '1';
+        }
+        if (newRightPage) {
+            newRightPage.style.transition = `opacity ${duration}ms ease`;
+            newRightPage.style.opacity = '1';
         }
         
-        // Show right page
-        if (rightPageNum <= this.totalPages) {
-            const rightPage = this.pages[rightPageNum - 1];
-            rightPage.style.display = 'flex';
-            rightPage.classList.add('active');
-        }
-        
-        // Preload adjacent pages
-        this.preloadPages(pageNum);
-        
-        // Save position
-        this.savePosition();
-        
-        // Update UI
-        this.updateUI();
+        // Clean up after transition
+        setTimeout(() => {
+            // Remove old pages
+            this.pages.forEach(page => {
+                if (page !== newLeftPage && page !== newRightPage) {
+                    page.classList.remove('active');
+                    page.style.display = 'none';
+                    page.style.opacity = '1';
+                    page.style.transition = '';
+                }
+            });
+            
+            // Finalize new pages - revert to normal flex layout
+            if (newLeftPage) {
+                newLeftPage.classList.add('active');
+                newLeftPage.style.position = '';
+                newLeftPage.style.top = '';
+                newLeftPage.style.left = '';
+                newLeftPage.style.transition = '';
+            }
+            if (newRightPage) {
+                newRightPage.classList.add('active');
+                newRightPage.style.position = '';
+                newRightPage.style.top = '';
+                newRightPage.style.left = '';
+                newRightPage.style.transition = '';
+            }
+            
+            this.isAnimating = false;
+            this.preloadPages(pageNum);
+            this.savePosition();
+            this.updateUI();
+        }, duration);
     }
 
     showSinglePage(pageNum, direction = 'forward') {

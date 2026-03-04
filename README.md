@@ -48,12 +48,15 @@ Transform any PDF into an interactive, web-based flipbook with stunning page-tur
 
 **[→ Try the Interactive Demo](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/)**
 
-Experience a real 52-page magazine flipbook with:
-- ✅ Touch/swipe gestures (mobile-optimized)
-- ✅ Keyboard navigation (desktop)
-- ✅ 60 FPS smooth animations
-- ✅ 24.9 MB total size (WebP optimized)
-- ✅ Works on all devices (phone, tablet, desktop)
+Experience a real 52-page magazine flipbook with **Realistic Mode**:
+- ✅ **Side panel layout** - Maximum vertical space for PDF viewing
+- ✅ **200 DPI resolution** - Crystal clear text and images
+- ✅ **Fully responsive** - Auto-adapts to desktop/tablet/mobile
+- ✅ **Touch/swipe gestures** - Natural mobile interaction
+- ✅ **Keyboard navigation** - Arrow keys, Page Up/Down, Home/End
+- ✅ **Physics-based animation** - Realistic page curl with shadows
+- ✅ **58 MB total size** - High quality WebP optimized images
+- ✅ **Works everywhere** - Phone, tablet, desktop browsers
 
 **Quick Start:**
 ```bash
@@ -217,6 +220,12 @@ pdf-flipbook convert book.pdf
 pdf-flipbook convert book.pdf --animation-mode simple
 ```
 
+**Features:**
+- ✅ Instant page transitions
+- ✅ Minimal resource usage
+- ✅ 60 FPS performance
+- ✅ Works on low-end devices
+
 **Perfect for:** E-books, documentation, reports
 
 ### 3D CSS 🎨
@@ -226,24 +235,70 @@ Lightweight 3D page folding effect using CSS transforms. Smooth animations with 
 pdf-flipbook convert book.pdf --animation-mode 3d-css
 ```
 
+**Features:**
+- ✅ CSS 3D transforms
+- ✅ Page fold effect
+- ✅ Smooth 60 FPS animations
+- ✅ No external libraries
+
 **Perfect for:** Magazines, portfolios, catalogs
 
-### Realistic 🎪
-Full 3D page curl using the StPageFlip library. Physics-based animation with realistic shadows and page curl. Supports mouse/touch dragging.
+### Realistic 🎪 ⭐ RECOMMENDED
+Full 3D page curl using the StPageFlip library. Physics-based animation with realistic shadows, page curl, and interactive dragging.
 
 ```bash
-pdf-flipbook convert book.pdf --animation-mode realistic
+pdf-flipbook convert book.pdf --animation-mode realistic --dpi 200 --quality 95
 ```
 
-**Perfect for:** Photo books, comic books, presentations
+**NEW Features (v0.2.0):**
+- ✅ **Side Panel Layout** - Maximizes vertical space (~99vh for PDF)
+- ✅ **Fully Responsive** - Auto-switches between single/two-page spread
+- ✅ **Dynamic Perspective** - 1200px (mobile), 1800px (tablet), 2400px (desktop)
+- ✅ **Physics-Based Animations** - Realistic page curl with dynamic shadows
+- ✅ **Interactive Dragging** - Click and drag pages to flip
+- ✅ **Touch Optimized** - Swipe gestures on mobile devices
+- ✅ **Window Resize Handling** - Automatically reinitializes on orientation change
+- ✅ **Smart Navigation** - Buttons adapt to single-page or two-page mode
+- ✅ **High DPI Support** - Crisp rendering at 150-200 DPI
+- ✅ **Fullscreen Mode** - Semi-transparent side panels
+
+**Layout:**
+```
+┌──────────┬─────────────────────────┬──────────────┐
+│  ◄ Prev  │   FULL-HEIGHT PDF      │  Title       │
+│          │   (99vh viewing area)   │  Page Info   │
+│          │                         │  Next ►      │
+│          │                         │  Progress    │
+└──────────┴─────────────────────────┴──────────────┘
+  80px           Flexible                180px
+```
+
+**Responsive Breakpoints:**
+- **Desktop** (≥1024px): Two-page spread, 80px + 180px side panels
+- **Tablet** (768-1023px): Single page, 70px + 140px side panels  
+- **Mobile** (<768px): Single page, 50px + 60px side panels
+
+**Perfect for:** Photo books, magazines, comic books, high-end presentations
 
 **Comparison:**
 
-| Mode | Performance | Visual Effect | Resource Usage | Best For |
-|------|-------------|---------------|----------------|----------|
-| Simple | ⚡⚡⚡ 60 FPS | Basic fade | Low | Large PDFs, fast loading |
-| 3D CSS | ⚡⚡ 60 FPS | Page fold | Medium | Balanced visual appeal |
-| Realistic | ⚡ 30+ FPS | Page curl | Higher | Immersive experience |
+| Mode | Performance | Visual Effect | Layout | Responsive | Best For |
+|------|-------------|---------------|--------|------------|----------|
+| Simple | ⚡⚡⚡ 60 FPS | Basic fade | Traditional | Yes | Large PDFs, fast loading |
+| 3D CSS | ⚡⚡ 60 FPS | Page fold | Traditional | Yes | Balanced visual appeal |
+| Realistic | ⚡ 30-60 FPS | Realistic curl | **Side Panels** | **Fully Adaptive** | Professional publications |
+
+**Recommended Settings:**
+```bash
+# Best quality for magazines/catalogs
+pdf-flipbook convert magazine.pdf -a realistic --dpi 200 --quality 95
+
+# Balanced quality/performance
+pdf-flipbook convert book.pdf -a realistic --dpi 150 --quality 90
+
+# Fast loading, good quality
+pdf-flipbook convert doc.pdf -a realistic --dpi 120 --quality 85
+```
 
 ## 📚 Output Structure
 
