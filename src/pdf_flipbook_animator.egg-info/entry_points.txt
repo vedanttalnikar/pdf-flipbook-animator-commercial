@@ -1,0 +1,2 @@
+[console_scripts]
+pdf-flipbook = pdf_flipbook_animator.cli:main

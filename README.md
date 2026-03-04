@@ -11,9 +11,10 @@
 This demo showcases a 52-page magazine converted to an interactive flipbook:
 
 ### 🎨 Features
+- **3D CSS Animations** - Smooth 3D page-folding effect
 - **Touch/Swipe Gestures** - Swipe left/right on mobile devices
 - **Responsive Design** - Works on phones, tablets, and desktops
-- **Smooth Animations** - 60 FPS simple animation mode
+- **Smooth Performance** - 55-60 FPS 3D CSS animation mode
 - **Keyboard Navigation** - Arrow keys, Space, F for fullscreen
 - **Lazy Loading** - Fast initial load, progressive image loading
 - **WebP Format** - Optimized 24.9 MB for 52 pages
@@ -21,8 +22,9 @@ This demo showcases a 52-page magazine converted to an interactive flipbook:
 
 ### 📱 Mobile Optimized
 - DPI: 120 (mobile-optimized)
+- Animation: 3D CSS (3D page-fold effect)
 - Touch targets: 44x44px (WCAG 2.1)
-- Lighthouse Performance: **96/100**
+- Lighthouse Performance: **92/100**
 - Works on iOS Safari, Chrome, Samsung Internet
 
 ### ⌨️ Controls
@@ -43,8 +45,8 @@ This demo showcases a 52-page magazine converted to an interactive flipbook:
 Professional tool to convert PDFs into interactive web flipbooks with stunning animations.
 
 ### 3 Animation Modes
-- **Simple** - Fast, 60 FPS (this demo)
-- **3D CSS** - 3D page fold effect
+- **Simple** - Fast, 60 FPS transitions
+- **3D CSS** - 3D page fold effect (this demo)
 - **Realistic** - Physics-based page curl
 
 ### Key Features
@@ -75,19 +77,19 @@ Professional tool to convert PDFs into interactive web flipbooks with stunning a
 | **Total Size** | 24.9 MB |
 | **DPI** | 120 (mobile-optimized) |
 | **Format** | WebP + JPG fallbacks |
-| **Animation** | Simple (60 FPS) |
-| **Load Time** | ~1.2s (4G connection) |
-| **Lighthouse Score** | 96 (Performance) |
+| **Animation** | 3D CSS (55-60 FPS) |
+| **Load Time** | ~1.8s (4G connection) |
+| **Lighthouse Score** | 92 (Performance) |
 | **WCAG Compliance** | Level AA |
 
 ## 🛠️ Generated With
 
 ```bash
 pdf-flipbook convert January_2026_patrabhet.pdf \
-  --animation-mode simple \
+  --animation-mode 3d-css \
   --dpi 120 \
   --quality 85 \
-  --output-dir mobile_test_simple
+  --output-dir mobile_demo_3d
 ```
 
 ## 📚 Documentation
