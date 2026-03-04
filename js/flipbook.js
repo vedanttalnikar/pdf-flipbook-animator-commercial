@@ -83,16 +83,15 @@ class Flipbook {
 
         const flipbook = document.getElementById('flipbook');
         if (flipbook) {
+            flipbook.style.position = 'relative';
+            flipbook.style.overflow = 'hidden';
+            
             if (this.spreadMode) {
-                flipbook.style.position = 'relative';
-                flipbook.style.overflow = 'hidden';
-                flipbook.style.display = 'flex';
-                flipbook.style.justifyContent = 'center';
-                flipbook.style.alignItems = 'center';
-                flipbook.style.gap = '0';
+                // Fixed container for spread mode to prevent size changes during animation
+                flipbook.style.display = 'block';
+                flipbook.style.width = '100%';
+                flipbook.style.height = '100%';
             } else {
-                flipbook.style.position = 'relative';
-                flipbook.style.overflow = 'hidden';
                 flipbook.style.display = 'block';
             }
         }
@@ -100,11 +99,16 @@ class Flipbook {
         // Prepare pages for 3D transforms
         this.pages.forEach((page, index) => {
             if (this.spreadMode) {
-                // Spread mode: side-by-side pages
-                page.style.position = 'relative';
+                // Spread mode: absolute positioning to prevent layout shifts
+                page.style.position = 'absolute';
+                page.style.top = '0';
                 page.style.width = '50%';
                 page.style.height = '100%';
-                page.style.flex = '0 0 auto';
+                page.style.flex = 'none';
+                // Position odd pages on left, even on right
+                const pageIndex = index + 1;
+                const isLeftPage = pageIndex % 2 === 1;
+                page.style.left = isLeftPage ? '0' : '50%';
             } else {
                 // Single page mode: stacked with 3D flip
                 page.style.position = 'absolute';
@@ -281,8 +285,10 @@ class Flipbook {
                 callback();
                 return;
             }
+            // Use smaller translateX to avoid overflow
+            page.style.willChange = 'transform, opacity';
             page.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity ${duration}ms ease`;
-            page.style.transform = slideDirection === 'left' ? 'translateX(-50%)' : 'translateX(50%)';
+            page.style.transform = slideDirection === 'left' ? 'translateX(-100%)' : 'translateX(100%)';
             page.style.opacity = '0';
             setTimeout(callback, duration);
         };
@@ -291,8 +297,9 @@ class Flipbook {
         const animateIn = (page) => {
             if (!page) return;
             page.style.display = 'flex';
+            page.style.willChange = 'transform, opacity';
             page.style.opacity = '0';
-            page.style.transform = slideDirection === 'left' ? 'translateX(50%)' : 'translateX(-50%)';
+            page.style.transform = slideDirection === 'left' ? 'translateX(100%)' : 'translateX(-100%)';
             page.classList.add('active');
             
             // Trigger reflow
@@ -331,6 +338,7 @@ class Flipbook {
                         currentLeftPage.style.transform = '';
                         currentLeftPage.style.opacity = '1';
                         currentLeftPage.style.transition = '';
+                        currentLeftPage.style.willChange = 'auto';
                     }
                     if (currentRightPage && currentRightPage !== targetRightPage) {
                         currentRightPage.classList.remove('active');
@@ -338,12 +346,15 @@ class Flipbook {
                         currentRightPage.style.transform = '';
                         currentRightPage.style.opacity = '1';
                         currentRightPage.style.transition = '';
+                        currentRightPage.style.willChange = 'auto';
                     }
                     if (targetLeftPage) {
                         targetLeftPage.style.transition = '';
+                        targetLeftPage.style.willChange = 'auto';
                     }
                     if (targetRightPage) {
                         targetRightPage.style.transition = '';
+                        targetRightPage.style.willChange = 'auto';
                     }
                     
                     this.isAnimating = false;

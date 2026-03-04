@@ -235,15 +235,14 @@ body {
 @media (min-width: 1024px) {
     .flipbook {
         max-width: 1400px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        display: block;
+        position: relative;
     }
 
     .page {
         max-width: 50%;
-        flex: 0 0 auto;
-        position: relative !important;
+        width: 50%;
+        position: absolute !important;
     }
 
     .page img {
@@ -253,11 +252,11 @@ body {
     }
 
     /* Book spine shadow effect between pages */
-    .page.active:first-child {
+    .page.active:first-of-type {
         box-shadow: 3px 0 10px rgba(0,0,0,0.2);
     }
 
-    .page.active + .page.active {
+    .page.active:last-of-type {
         box-shadow: -3px 0 10px rgba(0,0,0,0.2);
     }
 }
