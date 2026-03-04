@@ -8,7 +8,7 @@
 
 Transform any PDF into an interactive, web-based flipbook with stunning page-turning animations. Choose from simple transitions to realistic 3D page curl effects. Perfect for e-books, magazines, catalogs, and presentations.
 
-[🎬 Live Demo](https://pdf-flipbook-animator.com/demo) | [💼 Buy Now](https://pdf-flipbook-animator.com/pricing) | [📖 Documentation](https://docs.pdf-flipbook-animator.com) | [💬 Support](https://pdf-flipbook-animator.com/support)
+[🎬 **Live Demo** →](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/) | [💼 Buy Now](https://pdf-flipbook-animator.com/pricing) | [📖 Full Documentation](OUTPUT_USAGE_GUIDE.md) | [💬 Support](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
 
 ---
 
@@ -38,10 +38,18 @@ Transform any PDF into an interactive, web-based flipbook with stunning page-tur
 - 💾 **Position Memory** - Remembers where you left off
 - 🔄 **Batch Processing** - Convert multiple PDFs at once
 
-## 🎬 Demo
+## 🎬 Live Demo
 
-<!-- TODO: Add demo GIF/video here -->
+**[→ Try the Interactive Demo](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/)**
 
+Experience a real 52-page magazine flipbook with:
+- ✅ Touch/swipe gestures (mobile-optimized)
+- ✅ Keyboard navigation (desktop)
+- ✅ 60 FPS smooth animations
+- ✅ 24.9 MB total size (WebP optimized)
+- ✅ Works on all devices (phone, tablet, desktop)
+
+**Quick Start:**
 ```bash
 pdf-flipbook convert book.pdf
 # ✅ Flipbook created at: output/book/
