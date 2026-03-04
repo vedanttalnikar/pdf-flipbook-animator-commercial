@@ -88,6 +88,13 @@ body {
     align-items: center;
     position: relative;
     padding: 20px 0;
+    overflow: hidden;
+}
+
+#flipbook-viewer {
+    max-width: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 .flipbook {
@@ -233,10 +240,17 @@ body {
 
 /* Two-page spread for desktop */
 @media (min-width: 1024px) {
+    #flipbook-viewer {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
     .flipbook {
         max-width: 1400px;
+        width: 100%;
         display: block;
         position: relative;
+        margin: 0 auto;
     }
 
     .page {
@@ -265,12 +279,15 @@ body {
 @media (max-width: 1023px) {
     .flipbook {
         max-width: 100%;
+        width: 100%;
         display: block;
     }
 
     .page {
         max-width: 100%;
         width: 100%;
+        position: absolute !important;
+    }
         position: absolute !important;
     }
 }

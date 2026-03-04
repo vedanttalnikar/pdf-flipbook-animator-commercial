@@ -85,26 +85,36 @@ class Flipbook {
         if (flipbook) {
             flipbook.style.position = 'relative';
             flipbook.style.overflow = 'hidden';
+            flipbook.style.display = 'block';
             
             if (this.spreadMode) {
-                // Fixed container for spread mode to prevent size changes during animation
-                flipbook.style.display = 'block';
+                // Fixed container for spread mode to prevent expansion during animation
                 flipbook.style.width = '100%';
-                flipbook.style.height = '100%';
+                flipbook.style.maxWidth = '1400px';
+                flipbook.style.margin = '0 auto';
             } else {
-                flipbook.style.display = 'block';
+                // Mobile/single page mode - reset to default
+                flipbook.style.width = '';
+                flipbook.style.maxWidth = '';
+                flipbook.style.margin = '';
             }
         }
 
         // Prepare pages for 3D transforms
         this.pages.forEach((page, index) => {
+            // Common styles for all pages
+            page.style.transformStyle = 'preserve-3d';
+            page.style.backfaceVisibility = 'hidden';
+            page.style.zIndex = '0'; // Default z-index
+            page.style.boxSizing = 'border-box';
+            
             if (this.spreadMode) {
                 // Spread mode: absolute positioning to prevent layout shifts
                 page.style.position = 'absolute';
                 page.style.top = '0';
                 page.style.width = '50%';
                 page.style.height = '100%';
-                page.style.flex = 'none';
+                page.style.transformOrigin = 'center center';
                 // Position odd pages on left, even on right
                 const pageIndex = index + 1;
                 const isLeftPage = pageIndex % 2 === 1;
@@ -116,13 +126,8 @@ class Flipbook {
                 page.style.left = '0';
                 page.style.width = '100%';
                 page.style.height = '100%';
-                page.style.flex = 'none';
+                page.style.transformOrigin = 'left center';
             }
-            
-            page.style.transformStyle = 'preserve-3d';
-            page.style.transformOrigin = 'left center';
-            page.style.backfaceVisibility = 'hidden';
-            page.style.zIndex = '0'; // Default z-index
             
             // Add shadow element for depth if not exists
             let shadow = page.querySelector('.page-shadow');
@@ -275,6 +280,30 @@ class Flipbook {
         const targetLeftPage = this.pages[leftPageNum - 1];
         const targetRightPage = rightPageNum <= this.totalPages ? this.pages[rightPageNum - 1] : null;
         
+        // If showing same spread (e.g., initial load), just display it
+        if (oldLeftPageNum === leftPageNum) {
+            this.pages.forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+                page.style.transform = '';
+                page.style.opacity = '1';
+            });
+            
+            if (targetLeftPage) {
+                targetLeftPage.style.display = 'flex';
+                targetLeftPage.classList.add('active');
+            }
+            if (targetRightPage) {
+                targetRightPage.style.display = 'flex';
+                targetRightPage.classList.add('active');
+            }
+            
+            this.isAnimating = false;
+            this.currentPage = pageNum;
+            this.updateUI();
+            return;
+        }
+        
         // Determine animation direction
         const slideDirection = leftPageNum > oldLeftPageNum ? 'left' : 'right';
         const duration = 600;
@@ -399,6 +428,19 @@ class Flipbook {
                 page.style.zIndex = '0';
             }
         });
+
+        // If showing same page (e.g., initial load), just display it
+        if (oldPage === pageNum) {
+            if (targetPageEl) {
+                targetPageEl.style.display = 'flex';
+                targetPageEl.style.zIndex = '1';
+                targetPageEl.style.transform = '';
+                targetPageEl.classList.add('active');
+            }
+            this.isAnimating = false;
+            this.updateUI();
+            return;
+        }
 
         // Animate out current page with 3D flip
         if (currentPageEl && oldPage !== pageNum) {
