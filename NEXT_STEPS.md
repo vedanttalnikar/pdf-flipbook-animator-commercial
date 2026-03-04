@@ -9,19 +9,24 @@ git add .
 git commit -m "Initial commit: Complete PDF Flipbook Animator implementation"
 ```
 
-### Step 3: Create GitHub Repository
-1. Go to GitHub and create a new repository: `pdf-flipbook-animator`
-2. Update all URLs in the project (replace "yourusername" with actual username):
-   - `pyproject.toml` - repository URLs
-   - `README.md` - badge URLs and links
-   - `mkdocs.yml` - repo_url and site_url
-   - All `docs/*.md` files
-3. Push to GitHub:
+### Step 3: Create Private GitHub Repository
+1. Go to GitHub and create a new **private** repository: `pdf-flipbook-animator-commercial`
+2. Set visibility to **Private** (important for commercial product)
+3. Add team members as collaborators if needed
+4. Push to GitHub:
 ```powershell
-git remote add origin https://github.com/yourusername/pdf-flipbook-animator.git
+git remote add origin https://github.com/YOUR-USERNAME/pdf-flipbook-animator-commercial.git
 git branch -M main
 git push -u origin main
 ```
+
+### Additional Resources
+See [COMMERCIAL_SETUP.md](COMMERCIAL_SETUP.md) for comprehensive commercialization guide including:
+- License management system
+- Payment processing setup (Gumroad/Stripe)
+- Marketing strategy
+- Support infrastructure
+- Revenue projections
 
 ### Step 4: Run Tests
 ```powershell
