@@ -1,8 +1,14 @@
 # PDF Flipbook Animator
 
 [![Python Versions](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Source--Available%20Commercial-red.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-0.2.0-green.svg)](CHANGELOG.md)
+
+> **📢 Public Repository Notice:**  
+> This repository is **publicly visible for transparency and evaluation purposes only**.  
+> The code is **NOT open source** - it's commercial software with a source-available license.  
+> You can view and evaluate the code, but **a paid license is required for any production use**.  
+> See [LICENSE](LICENSE) for details.
 
 **Professional PDF to Flipbook Converter - Premium Animation Effects**
 
