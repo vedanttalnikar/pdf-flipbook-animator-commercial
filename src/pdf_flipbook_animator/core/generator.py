@@ -270,10 +270,12 @@ body {{
 .flipbook {{
     max-width: 100%;
     max-height: 80vh;
+    min-height: 400px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     overflow: hidden;
     background: white;
+    position: relative;
 }}
 
 .page {{
@@ -281,12 +283,16 @@ body {{
     width: 100%;
     height: 100%;
     background: white;
+    position: absolute;
+    top: 0;
+    left: 0;
 }}
 
 .page.active {{
     display: flex;
     justify-content: center;
     align-items: center;
+    position: absolute;
 }}
 
 .page img {{

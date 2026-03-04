@@ -51,13 +51,27 @@ class Flipbook {
         if (viewer) {
             viewer.style.perspective = '2000px';
             viewer.style.perspectiveOrigin = 'center center';
+            viewer.style.overflow = 'hidden'; // Prevent page visibility below
+        }
+
+        const flipbook = document.getElementById('flipbook');
+        if (flipbook) {
+            flipbook.style.position = 'relative';
+            flipbook.style.overflow = 'hidden'; // Prevent pages from showing below
         }
 
         // Prepare pages for 3D transforms
         this.pages.forEach((page, index) => {
+            // Make pages absolutely positioned and stack them
+            page.style.position = 'absolute';
+            page.style.top = '0';
+            page.style.left = '0';
+            page.style.width = '100%';
+            page.style.height = '100%';
             page.style.transformStyle = 'preserve-3d';
             page.style.transformOrigin = 'left center';
             page.style.backfaceVisibility = 'hidden';
+            page.style.zIndex = '0'; // Default z-index
             
             // Add shadow element for depth
             const shadow = document.createElement('div');
@@ -187,11 +201,25 @@ class Flipbook {
         const currentPageEl = this.pages[oldPage - 1];
         const targetPageEl = this.pages[pageNum - 1];
 
+        // Hide all pages first and reset z-index
+        this.pages.forEach(page => {
+            if (page !== currentPageEl && page !== targetPageEl) {
+                page.classList.remove('active');
+                page.style.display = 'none';
+                page.style.zIndex = '0';
+            }
+        });
+
         // Animate out current page with 3D flip
         if (currentPageEl && oldPage !== pageNum) {
+            currentPageEl.style.display = 'flex';
+            currentPageEl.style.zIndex = '2'; // Put current page above others
+            
             this.animate3DPageFlip(currentPageEl, direction === 'forward' ? -180 : 180, () => {
                 currentPageEl.classList.remove('active');
+                currentPageEl.style.display = 'none';
                 currentPageEl.style.transform = '';
+                currentPageEl.style.zIndex = '0';
                 
                 // Reset shadow
                 const shadow = currentPageEl.querySelector('.page-shadow');
@@ -202,6 +230,8 @@ class Flipbook {
         // Animate in target page
         if (targetPageEl) {
             // Prepare target page
+            targetPageEl.style.display = 'flex';
+            targetPageEl.style.zIndex = '3'; // Put target page above current
             targetPageEl.style.transform = `rotateY(${direction === 'forward' ? 180 : -180}deg)`;
             targetPageEl.classList.add('active');
             
@@ -213,6 +243,7 @@ class Flipbook {
                 this.animate3DPageFlip(targetPageEl, 0, () => {
                     this.isAnimating = false;
                     this.currentPage = pageNum;
+                    targetPageEl.style.zIndex = '1'; // Keep active page at z-index 1
                     
                     // Preload adjacent pages
                     this.preloadPages(pageNum);
