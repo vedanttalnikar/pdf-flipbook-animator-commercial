@@ -8,6 +8,12 @@ class Flipbook {
         this.pages = document.querySelectorAll('.page');
         this.isAnimating = false;
         
+        // Touch handling
+        this.touchStartX = 0;
+        this.touchEndX = 0;
+        this.touchStartY = 0;
+        this.touchEndY = 0;
+        
         this.init();
     }
 
@@ -28,6 +34,7 @@ class Flipbook {
         this.setupControls();
         this.setupKeyboard();
         this.setupFullscreen();
+        this.setupTouch();
         
         // Restore saved position
         this.restorePosition();
@@ -128,6 +135,45 @@ class Flipbook {
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         if (fullscreenBtn) {
             fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+        }
+    }
+
+    setupTouch() {
+        const flipbook = document.getElementById('flipbook');
+        if (!flipbook) return;
+
+        // Touch start
+        flipbook.addEventListener('touchstart', (e) => {
+            this.touchStartX = e.changedTouches[0].screenX;
+            this.touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        // Touch end - detect swipe
+        flipbook.addEventListener('touchend', (e) => {
+            this.touchEndX = e.changedTouches[0].screenX;
+            this.touchEndY = e.changedTouches[0].screenY;
+            this.handleSwipe();
+        }, { passive: true });
+    }
+
+    handleSwipe() {
+        if (this.isAnimating) return;
+        
+        const deltaX = this.touchEndX - this.touchStartX;
+        const deltaY = this.touchEndY - this.touchStartY;
+        const minSwipeDistance = 50;
+
+        // Check if swipe is primarily horizontal
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (Math.abs(deltaX) > minSwipeDistance) {
+                if (deltaX > 0) {
+                    // Swipe right - go to previous page
+                    this.previousPage();
+                } else {
+                    // Swipe left - go to next page
+                    this.nextPage();
+                }
+            }
         }
     }
 
