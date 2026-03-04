@@ -251,44 +251,125 @@ class Flipbook {
         }
     }
 
-    showSpread(pageNum) {
-        // In spread mode, show two pages side-by-side
+    showSpread(pageNum, direction = 'forward') {
+        // In spread mode, show two pages side-by-side with smooth animation
+        if (this.isAnimating) return;
+        
+        this.isAnimating = true;
+        const oldPage = this.currentPage;
+        
         // Ensure we start on an odd page (left page)
         const leftPageNum = pageNum % 2 === 0 ? pageNum - 1 : pageNum;
         const rightPageNum = leftPageNum + 1;
         
-        this.currentPage = pageNum;
+        // Get current and target spread pages
+        const oldLeftPageNum = oldPage % 2 === 0 ? oldPage - 1 : oldPage;
+        const oldRightPageNum = oldLeftPageNum + 1;
         
-        // Hide all pages
+        const currentLeftPage = this.pages[oldLeftPageNum - 1];
+        const currentRightPage = oldRightPageNum <= this.totalPages ? this.pages[oldRightPageNum - 1] : null;
+        const targetLeftPage = this.pages[leftPageNum - 1];
+        const targetRightPage = rightPageNum <= this.totalPages ? this.pages[rightPageNum - 1] : null;
+        
+        // Determine animation direction
+        const slideDirection = leftPageNum > oldLeftPageNum ? 'left' : 'right';
+        const duration = 600;
+        
+        // Animate out current spread
+        const animateOut = (page, callback) => {
+            if (!page) {
+                callback();
+                return;
+            }
+            page.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity ${duration}ms ease`;
+            page.style.transform = slideDirection === 'left' ? 'translateX(-50%)' : 'translateX(50%)';
+            page.style.opacity = '0';
+            setTimeout(callback, duration);
+        };
+        
+        // Animate in target spread
+        const animateIn = (page) => {
+            if (!page) return;
+            page.style.display = 'flex';
+            page.style.opacity = '0';
+            page.style.transform = slideDirection === 'left' ? 'translateX(50%)' : 'translateX(-50%)';
+            page.classList.add('active');
+            
+            // Trigger reflow
+            page.offsetHeight;
+            
+            page.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity ${duration}ms ease`;
+            page.style.transform = 'translateX(0)';
+            page.style.opacity = '1';
+        };
+        
+        // Hide all other pages
         this.pages.forEach(page => {
-            page.classList.remove('active');
-            page.style.display = 'none';
-            page.style.transform = '';
-            page.style.zIndex = '0';
+            if (page !== currentLeftPage && page !== currentRightPage && 
+                page !== targetLeftPage && page !== targetRightPage) {
+                page.classList.remove('active');
+                page.style.display = 'none';
+                page.style.transform = '';
+                page.style.opacity = '1';
+            }
         });
         
-        // Show left page
-        if (leftPageNum >= 1 && leftPageNum <= this.totalPages) {
-            const leftPage = this.pages[leftPageNum - 1];
-            leftPage.style.display = 'flex';
-            leftPage.classList.add('active');
+        // Start animation sequence
+        let animationsComplete = 0;
+        const checkComplete = () => {
+            animationsComplete++;
+            if (animationsComplete >= 2) { // Wait for both old pages to animate out
+                // Animate in new pages
+                animateIn(targetLeftPage);
+                if (targetRightPage) animateIn(targetRightPage);
+                
+                // Clean up after animation
+                setTimeout(() => {
+                    if (currentLeftPage && currentLeftPage !== targetLeftPage) {
+                        currentLeftPage.classList.remove('active');
+                        currentLeftPage.style.display = 'none';
+                        currentLeftPage.style.transform = '';
+                        currentLeftPage.style.opacity = '1';
+                        currentLeftPage.style.transition = '';
+                    }
+                    if (currentRightPage && currentRightPage !== targetRightPage) {
+                        currentRightPage.classList.remove('active');
+                        currentRightPage.style.display = 'none';
+                        currentRightPage.style.transform = '';
+                        currentRightPage.style.opacity = '1';
+                        currentRightPage.style.transition = '';
+                    }
+                    if (targetLeftPage) {
+                        targetLeftPage.style.transition = '';
+                    }
+                    if (targetRightPage) {
+                        targetRightPage.style.transition = '';
+                    }
+                    
+                    this.isAnimating = false;
+                    this.currentPage = pageNum;
+                    
+                    // Preload adjacent pages
+                    this.preloadPages(pageNum);
+                    
+                    // Save position
+                    this.savePosition();
+                    
+                    // Update UI
+                    this.updateUI();
+                }, duration);
+            }
+        };
+        
+        // Animate out current pages
+        if (oldPage !== pageNum) {
+            animateOut(currentLeftPage, checkComplete);
+            animateOut(currentRightPage, checkComplete);
+        } else {
+            // Same page, just show it
+            checkComplete();
+            checkComplete();
         }
-        
-        // Show right page
-        if (rightPageNum <= this.totalPages) {
-            const rightPage = this.pages[rightPageNum - 1];
-            rightPage.style.display = 'flex';
-            rightPage.classList.add('active');
-        }
-        
-        // Preload adjacent pages
-        this.preloadPages(pageNum);
-        
-        // Save position
-        this.savePosition();
-        
-        // Update UI
-        this.updateUI();
     }
 
     showSinglePage(pageNum, direction = 'forward') {
