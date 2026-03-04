@@ -407,6 +407,52 @@ body {{
 }}
 
 /* Responsive Design */
+
+/* Two-page spread for desktop */
+@media (min-width: 1024px) {{
+    .flipbook {{
+        max-width: 1400px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }}
+
+    .page {{
+        max-width: 50%;
+        flex: 0 0 auto;
+        position: relative !important;
+    }}
+
+    .page img {{
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+    }}
+
+    /* Book spine shadow effect between pages */
+    .page.active:first-child {{
+        box-shadow: 3px 0 10px rgba(0,0,0,0.2);
+    }}
+
+    .page.active + .page.active {{
+        box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+    }}
+}}
+
+/* Single page for mobile/tablet */
+@media (max-width: 1023px) {{
+    .flipbook {{
+        max-width: 100%;
+        display: block;
+    }}
+
+    .page {{
+        max-width: 100%;
+        width: 100%;
+        position: absolute !important;
+    }}
+}}
+
 @media (max-width: 768px) {{
     .header {{
         flex-direction: column;

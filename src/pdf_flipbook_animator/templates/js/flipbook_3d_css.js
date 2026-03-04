@@ -8,6 +8,10 @@ class Flipbook {
         this.pages = document.querySelectorAll('.page');
         this.isAnimating = false;
         
+        // Responsive spread mode
+        this.spreadBreakpoint = 1024;
+        this.spreadMode = this.shouldUseSpreadMode();
+        
         // Touch handling
         this.touchStartX = 0;
         this.touchEndX = 0;
@@ -17,9 +21,16 @@ class Flipbook {
         this.init();
     }
 
+    shouldUseSpreadMode() {
+        return window.innerWidth >= this.spreadBreakpoint;
+    }
+
     init() {
         // Add 3D container styles
         this.setup3DStyles();
+        
+        // Setup responsive behavior
+        this.setupResponsive();
         
         // Show first page
         this.showPage(1);
@@ -42,7 +53,23 @@ class Flipbook {
         // Update UI
         this.updateUI();
 
-        console.log(`Flipbook initialized with ${this.totalPages} pages (3D CSS mode)`);
+        console.log(`Flipbook initialized with ${this.totalPages} pages (3D CSS mode, Spread: ${this.spreadMode})`);
+    }
+
+    setupResponsive() {
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const newSpreadMode = this.shouldUseSpreadMode();
+                if (newSpreadMode !== this.spreadMode) {
+                    this.spreadMode = newSpreadMode;
+                    this.setup3DStyles();
+                    this.showPage(this.currentPage);
+                    console.log(`Switched to ${this.spreadMode ? 'spread' : 'single'} mode`);
+                }
+            }, 250);
+        });
     }
 
     setup3DStyles() {
@@ -56,39 +83,62 @@ class Flipbook {
 
         const flipbook = document.getElementById('flipbook');
         if (flipbook) {
-            flipbook.style.position = 'relative';
-            flipbook.style.overflow = 'hidden'; // Prevent pages from showing below
+            if (this.spreadMode) {
+                flipbook.style.position = 'relative';
+                flipbook.style.overflow = 'hidden';
+                flipbook.style.display = 'flex';
+                flipbook.style.justifyContent = 'center';
+                flipbook.style.alignItems = 'center';
+                flipbook.style.gap = '0';
+            } else {
+                flipbook.style.position = 'relative';
+                flipbook.style.overflow = 'hidden';
+                flipbook.style.display = 'block';
+            }
         }
 
         // Prepare pages for 3D transforms
         this.pages.forEach((page, index) => {
-            // Make pages absolutely positioned and stack them
-            page.style.position = 'absolute';
-            page.style.top = '0';
-            page.style.left = '0';
-            page.style.width = '100%';
-            page.style.height = '100%';
+            if (this.spreadMode) {
+                // Spread mode: side-by-side pages
+                page.style.position = 'relative';
+                page.style.width = '50%';
+                page.style.height = '100%';
+                page.style.flex = '0 0 auto';
+            } else {
+                // Single page mode: stacked with 3D flip
+                page.style.position = 'absolute';
+                page.style.top = '0';
+                page.style.left = '0';
+                page.style.width = '100%';
+                page.style.height = '100%';
+                page.style.flex = 'none';
+            }
+            
             page.style.transformStyle = 'preserve-3d';
             page.style.transformOrigin = 'left center';
             page.style.backfaceVisibility = 'hidden';
             page.style.zIndex = '0'; // Default z-index
             
-            // Add shadow element for depth
-            const shadow = document.createElement('div');
-            shadow.className = 'page-shadow';
-            shadow.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(to right, rgba(0,0,0,0.3), transparent);
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-                z-index: 1;
-            `;
-            page.appendChild(shadow);
+            // Add shadow element for depth if not exists
+            let shadow = page.querySelector('.page-shadow');
+            if (!shadow) {
+                shadow = document.createElement('div');
+                shadow.className = 'page-shadow';
+                shadow.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(to right, rgba(0,0,0,0.3), transparent);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    pointer-events: none;
+                    z-index: 1;
+                `;
+                page.appendChild(shadow);
+            }
         });
     }
 
@@ -194,6 +244,54 @@ class Flipbook {
     showPage(pageNum, direction = 'forward') {
         if (pageNum < 1 || pageNum > this.totalPages || this.isAnimating) return;
         
+        if (this.spreadMode) {
+            this.showSpread(pageNum);
+        } else {
+            this.showSinglePage(pageNum, direction);
+        }
+    }
+
+    showSpread(pageNum) {
+        // In spread mode, show two pages side-by-side
+        // Ensure we start on an odd page (left page)
+        const leftPageNum = pageNum % 2 === 0 ? pageNum - 1 : pageNum;
+        const rightPageNum = leftPageNum + 1;
+        
+        this.currentPage = pageNum;
+        
+        // Hide all pages
+        this.pages.forEach(page => {
+            page.classList.remove('active');
+            page.style.display = 'none';
+            page.style.transform = '';
+            page.style.zIndex = '0';
+        });
+        
+        // Show left page
+        if (leftPageNum >= 1 && leftPageNum <= this.totalPages) {
+            const leftPage = this.pages[leftPageNum - 1];
+            leftPage.style.display = 'flex';
+            leftPage.classList.add('active');
+        }
+        
+        // Show right page
+        if (rightPageNum <= this.totalPages) {
+            const rightPage = this.pages[rightPageNum - 1];
+            rightPage.style.display = 'flex';
+            rightPage.classList.add('active');
+        }
+        
+        // Preload adjacent pages
+        this.preloadPages(pageNum);
+        
+        // Save position
+        this.savePosition();
+        
+        // Update UI
+        this.updateUI();
+    }
+
+    showSinglePage(pageNum, direction = 'forward') {
         this.isAnimating = true;
         const oldPage = this.currentPage;
 
@@ -290,13 +388,17 @@ class Flipbook {
 
     nextPage() {
         if (this.currentPage < this.totalPages && !this.isAnimating) {
-            this.showPage(this.currentPage + 1, 'forward');
+            const increment = this.spreadMode ? 2 : 1;
+            const nextPage = Math.min(this.currentPage + increment, this.totalPages);
+            this.showPage(nextPage, 'forward');
         }
     }
 
     previousPage() {
         if (this.currentPage > 1 && !this.isAnimating) {
-            this.showPage(this.currentPage - 1, 'backward');
+            const decrement = this.spreadMode ? 2 : 1;
+            const prevPage = Math.max(this.currentPage - decrement, 1);
+            this.showPage(prevPage, 'backward');
         }
     }
 
