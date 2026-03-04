@@ -12,6 +12,18 @@ Transform any PDF into an interactive, web-based flipbook with stunning page-tur
 
 ---
 
+## 📚 Complete Documentation
+
+**→ [OUTPUT_USAGE_GUIDE.md](OUTPUT_USAGE_GUIDE.md)** - **Comprehensive guide covering:**
+- 🚀 **Complete API Reference** - All CLI options and Python API
+- 📱 **Mobile Usage** - How to use flipbooks on phones/tablets (touch/swipe enabled)
+- 🌐 **Web Hosting** - Deploy to Netlify, GitHub Pages, Vercel, or any hosting
+- 🎯 **Recommended Configs** - By use case (magazine, catalog, portfolio, etc.)
+- 📦 **Output Format Details** - File structure, sizes, performance benchmarks
+- 🔧 **Advanced Configuration** - Custom templates, embedding, optimization
+
+---
+
 ## ✨ Features
 
 - 📄 **PDF to Web** - Convert any PDF to an interactive flipbook
@@ -376,9 +388,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 📖 [Documentation](https://yourusername.github.io/pdf-flipbook-animator)
+**Documentation:**
+- 📖 [Complete Output & Usage Guide](OUTPUT_USAGE_GUIDE.md) - Mobile, web, hosting, all API options
+- 📱 [Mobile Device Testing](MOBILE_TESTING.md) - Touch/swipe testing procedures
+- 💼 [Commercial Setup Guide](COMMERCIAL_SETUP.md) - Licensing and monetization
+- 📝 [Changelog](CHANGELOG.md) - Version history
+
+**Community:**
 - 🐛 [Issue Tracker](https://github.com/yourusername/pdf-flipbook-animator/issues)
 - 💬 [Discussions](https://github.com/yourusername/pdf-flipbook-animator/discussions)
+- 📧 Email: support@pdf-flipbook-animator.com
 
 ## 🗺️ Roadmap
 
