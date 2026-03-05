@@ -224,7 +224,7 @@ body {{
     flex-direction: row;
 }}
 
-/* Side Panels Layout */
+/* Side Panels Layout (Desktop/Tablet Default) */
 .left-panel,
 .right-panel {{
     flex-shrink: 0;
@@ -249,6 +249,47 @@ body {{
     border-right: none;
     justify-content: flex-start;
     padding: 20px 15px;
+}}
+
+/* Side Navigation Buttons (Base Styles) */
+.side-nav-btn {{
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-height: 80px;
+    width: 100%;
+}}
+
+.side-nav-btn:hover:not(:disabled) {{
+    background: color-mix(in srgb, var(--primary-color) 85%, black);
+    transform: scale(1.05);
+    box-shadow: var(--shadow);
+}}
+
+.side-nav-btn:disabled {{
+    opacity: 0.4;
+    cursor: not-allowed;
+}}
+
+.side-nav-btn .arrow {{
+    font-size: 1.5rem;
+    line-height: 1;
+}}
+
+.side-nav-btn .label {{
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }}
 
 /* Panel Header */
@@ -465,57 +506,108 @@ body {{
 
 /* Responsive Design with Dynamic Perspective */
 
-/* Mobile: Compact side panels */
+/* Mobile: VERTICAL LAYOUT (Header/Footer instead of Side Panels) */
 @media (max-width: 767px) {{
+    /* Switch to vertical column layout */
+    .container {{
+        flex-direction: column;
+    }}
+    
     .main {{
         perspective: 1200px;
+        order: 2;
+        flex: 1;
     }}
     
+    /* Left panel becomes HEADER at top */
     .left-panel {{
-        width: 50px;
-        padding: 10px 5px;
+        order: 1;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        padding: 10px 15px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        gap: 15px;
     }}
     
+    /* Right panel becomes FOOTER at bottom */
     .right-panel {{
-        width: 60px;
-        padding: 10px 5px;
-        gap: 10px;
+        order: 3;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        padding: 10px 15px;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        gap: 15px;
+        justify-content: space-between;
+        align-items: center;
     }}
     
-    .panel-header .title {{
-        font-size: 0.65rem;
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
-    }}
-    
+    /* Header/Footer button styling */
     .side-nav-btn {{
-        min-height: 60px;
-        padding: 10px 5px;
-        font-size: 0.7rem;
+        flex-direction: row;
+        min-height: auto;
+        padding: 10px 20px;
+        gap: 8px;
+        width: auto;
+        flex: 0 0 auto;
     }}
     
     .side-nav-btn .arrow {{
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }}
     
     .side-nav-btn .label {{
-        display: none;
+        display: inline;
+        font-size: 0.85rem;
+    }}
+    
+    /* Panel header becomes horizontal */
+    .panel-header {{
+        flex-direction: row;
+        border-bottom: none;
+        border-right: 1px solid var(--border-color);
+        padding: 0 15px 0 0;
+        margin: 0;
+        gap: 10px;
+        flex: 1;
+    }}
+    
+    .panel-header .title {{
+        font-size: 0.9rem;
+        text-align: left;
+        writing-mode: horizontal-tb;
+    }}
+    
+    .icon-btn {{
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+        padding: 6px;
+    }}
+    
+    /* Page info horizontal */
+    .page-info {{
+        padding: 0;
+        flex: 0 0 auto;
     }}
     
     .page-indicator {{
-        font-size: 0.75rem;
-        writing-mode: vertical-rl;
+        font-size: 0.95rem;
+        writing-mode: horizontal-tb;
+    }}
+    
+    /* Progress bar in footer */
+    .progress-container {{
+        padding: 0;
+        flex: 1;
+        max-width: 200px;
     }}
     
     .help-text {{
         display: none;
-    }}
-    
-    .icon-btn {{
-        width: 30px;
-        height: 30px;
-        font-size: 0.9rem;
-        padding: 5px;
     }}
 }}
 
@@ -571,25 +663,37 @@ body {{
     }}
 }}
 
-/* Extra small mobile devices */
+/* Extra small mobile devices - Compact header/footer */
 @media (max-width: 480px) {{
-    .left-panel {{
-        width: 40px;
-        padding: 8px 3px;
-    }}
-    
+    .left-panel,
     .right-panel {{
-        width: 50px;
-        padding: 8px 3px;
+        padding: 8px 10px;
+        gap: 10px;
     }}
     
     .side-nav-btn {{
-        min-height: 50px;
-        padding: 8px 3px;
+        padding: 8px 15px;
+        font-size: 0.75rem;
     }}
     
     .side-nav-btn .arrow {{
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }}
+    
+    .side-nav-btn .label {{
+        font-size: 0.75rem;
+    }}
+    
+    .panel-header .title {{
+        font-size: 0.8rem;
+    }}
+    
+    .page-indicator {{
+        font-size: 0.85rem;
+    }}
+    
+    .progress-container {{
+        max-width: 120px;
     }}
 }}
 
