@@ -114,6 +114,17 @@ def cli(verbose: bool, quiet: bool):
     is_flag=True,
     help="Enable 3D page curl effect (realistic mode only)",
 )
+@click.option(
+    "--index-page",
+    type=click.IntRange(1, 9999),
+    default=2,
+    help="Page number for index button (default: 2)",
+)
+@click.option(
+    "--no-index-button",
+    is_flag=True,
+    help="Disable jump-to-index button",
+)
 def convert(
     pdf_path: Path,
     output_dir: Optional[Path],
@@ -127,6 +138,8 @@ def convert(
     animation_mode: str,
     flip_duration: int,
     enable_curl: bool,
+    index_page: int,
+    no_index_button: bool,
 ):
     """Convert a PDF to an animated flipbook.
 
@@ -164,6 +177,8 @@ def convert(
             page_flip_duration=flip_duration,
             enable_page_curl=enable_curl,
             output_dir=output_dir,
+            enable_index_button=not no_index_button,
+            index_page=index_page,
         )
 
         click.echo(f"\n📄 Converting PDF: {click.style(pdf_path.name, fg='cyan', bold=True)}")

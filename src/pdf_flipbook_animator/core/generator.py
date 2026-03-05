@@ -152,6 +152,7 @@ class FlipbookGenerator:
         <aside class="right-panel">
             <div class="panel-header">
                 <h1 class="title">{title}</h1>
+                {'<button id="index-btn" class="icon-btn" title="Jump to Index (Page ' + str(self.config.index_page) + ')" data-index-page="' + str(self.config.index_page) + '">📑</button>' if self.config.enable_index_button and page_count >= self.config.index_page else ''}
                 {'<button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen (F)">⛶</button>' if self.config.enable_fullscreen else ''}
             </div>
             

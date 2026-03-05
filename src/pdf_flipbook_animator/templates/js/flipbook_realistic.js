@@ -12,6 +12,7 @@ class Flipbook {
         this.resizeTimeout = null;
         this.aspectRatio = null;
         this.isMobileMode = false; // Track if in mobile (single-page) mode
+        this.indexPage = parseInt(document.getElementById('index-btn')?.dataset.indexPage || 2);
         
         // Collect all image paths
         document.querySelectorAll('.page img').forEach(img => {
@@ -285,6 +286,7 @@ class Flipbook {
     setupControls() {
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
+        const indexBtn = document.getElementById('index-btn');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
 
         if (prevBtn) {
@@ -293,6 +295,10 @@ class Flipbook {
 
         if (nextBtn) {
             nextBtn.addEventListener('click', () => this.nextPage());
+        }
+
+        if (indexBtn) {
+            indexBtn.addEventListener('click', () => this.goToPage(this.indexPage));
         }
 
         if (fullscreenBtn) {
@@ -391,6 +397,7 @@ class Flipbook {
         // Update buttons
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
+        const indexBtn = document.getElementById('index-btn');
 
         if (prevBtn) {
             prevBtn.disabled = this.currentPage === 1;
@@ -398,6 +405,10 @@ class Flipbook {
 
         if (nextBtn) {
             nextBtn.disabled = this.currentPage === this.totalPages;
+        }
+
+        if (indexBtn) {
+            indexBtn.disabled = this.currentPage === this.indexPage;
         }
 
         // Update progress bar

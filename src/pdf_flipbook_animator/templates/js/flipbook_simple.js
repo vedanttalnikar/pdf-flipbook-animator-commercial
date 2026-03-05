@@ -6,6 +6,7 @@ class Flipbook {
         this.currentPage = 1;
         this.totalPages = parseInt(document.getElementById('total-pages').textContent);
         this.pages = document.querySelectorAll('.page');
+        this.indexPage = parseInt(document.getElementById('index-btn')?.dataset.indexPage || 2);
         
         // Touch handling
         this.touchStartX = 0;
@@ -44,6 +45,7 @@ class Flipbook {
     setupControls() {
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
+        const indexBtn = document.getElementById('index-btn');
 
         if (prevBtn) {
             prevBtn.addEventListener('click', () => this.previousPage());
@@ -51,6 +53,10 @@ class Flipbook {
 
         if (nextBtn) {
             nextBtn.addEventListener('click', () => this.nextPage());
+        }
+
+        if (indexBtn) {
+            indexBtn.addEventListener('click', () => this.goToPage(this.indexPage));
         }
 
         // Click on page to advance
@@ -200,6 +206,7 @@ class Flipbook {
         // Update buttons
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
+        const indexBtn = document.getElementById('index-btn');
 
         if (prevBtn) {
             prevBtn.disabled = this.currentPage === 1;
@@ -207,6 +214,10 @@ class Flipbook {
 
         if (nextBtn) {
             nextBtn.disabled = this.currentPage === this.totalPages;
+        }
+
+        if (indexBtn) {
+            indexBtn.disabled = this.currentPage === this.indexPage;
         }
 
         // Update progress bar

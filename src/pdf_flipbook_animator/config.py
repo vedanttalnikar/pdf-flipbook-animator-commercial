@@ -21,6 +21,8 @@ class Config:
     enable_fullscreen: bool = True
     enable_download: bool = True
     show_page_numbers: bool = True
+    enable_index_button: bool = True  # Show jump-to-index button
+    index_page: int = 2  # Page number for index button (1-based)
 
     # Performance settings
     lazy_load: bool = True
@@ -65,6 +67,9 @@ class Config:
 
         if not 200 <= self.page_flip_duration <= 2000:
             raise ValueError("page_flip_duration must be between 200-2000ms")
+
+        if self.index_page < 1:
+            raise ValueError("index_page must be at least 1")
 
 
 # Default configuration
