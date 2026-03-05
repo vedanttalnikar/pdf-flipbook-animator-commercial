@@ -233,11 +233,15 @@ class Flipbook {
                 this.setupPageFlipEvents();
                 this.setupControls();
                 this.setupKeyboard();
-            }
-            
-            // Restore saved position (only on first init)
-            if (!this.isInitialized) {
-                this.restorePosition();
+                
+                // Only restore position if not a fresh start (startPage provided)
+                if (startPage > 0) {
+                    this.restorePosition();
+                } else {
+                    // Start at page 1 for new sessions
+                    this.currentPage = 1;
+                    this.updateUI();
+                }
             } else {
                 // Just update the page
                 this.currentPage = startPage + 1;

@@ -351,12 +351,23 @@ body {{
 }}
 
 .flipbook {{
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     overflow: visible;
     background: white;
     position: relative;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}}
+
+#stpageflip-container {{
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }}
 
 .page {{
@@ -573,12 +584,18 @@ body {{
         margin: 0;
         gap: 10px;
         flex: 1;
+        min-width: 0;
     }}
     
     .panel-header .title {{
         font-size: 0.9rem;
         text-align: left;
         writing-mode: horizontal-tb;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+        min-width: 0;
     }}
     
     .icon-btn {{
