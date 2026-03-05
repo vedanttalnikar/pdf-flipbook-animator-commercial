@@ -94,7 +94,7 @@ class PDFConverter:
                 webp_path = images_dir / f"{page_filename}.webp"
 
                 img_size = convert_to_webp(
-                    img, webp_path, quality=self.config.quality
+                    img, webp_path, quality=self.config.quality, lossless=self.config.lossless_webp
                 )
                 total_size += img_size
 

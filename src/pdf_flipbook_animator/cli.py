@@ -76,6 +76,12 @@ def cli(verbose: bool, quiet: bool):
     help="JPG fallback quality 1-100 (default: 90)",
 )
 @click.option(
+    "--lossless",
+    is_flag=True,
+    default=False,
+    help="Use lossless WebP compression (best for text/diagrams, larger files)",
+)
+@click.option(
     "--title",
     type=str,
     help="Flipbook title (default: PDF filename)",
@@ -131,6 +137,7 @@ def convert(
     dpi: int,
     quality: int,
     jpg_quality: int,
+    lossless: bool,
     title: Optional[str],
     single_page: bool,
     no_fullscreen: bool,
@@ -169,6 +176,7 @@ def convert(
             dpi=dpi,
             quality=quality,
             jpg_quality=jpg_quality,
+            lossless_webp=lossless,
             title=title,
             single_page_mode=single_page,
             enable_fullscreen=not no_fullscreen,

@@ -10,27 +10,34 @@ logger = logging.getLogger(__name__)
 
 
 def convert_to_webp(
-    image: Image.Image, output_path: Path, quality: int = 85
+    image: Image.Image, output_path: Path, quality: int = 85, lossless: bool = False
 ) -> int:
     """Convert PIL Image to WebP format.
 
     Args:
         image: PIL Image object
         output_path: Path to save WebP file
-        quality: WebP quality (1-100)
+        quality: WebP quality (1-100, ignored if lossless=True)
+        lossless: Use lossless compression (better for text/diagrams)
 
     Returns:
         File size in bytes
     """
     try:
-        image.save(
-            output_path,
-            "WEBP",
-            quality=quality,
-            method=6,  # Best compression
-        )
+        save_params = {
+            "format": "WEBP",
+            "lossless": lossless,
+        }
+        
+        if not lossless:
+            # Lossy mode: use quality and method settings
+            save_params["quality"] = quality
+            save_params["method"] = 6  # Best compression
+        
+        image.save(output_path, **save_params)
         file_size = output_path.stat().st_size
-        logger.debug(f"Saved WebP: {output_path.name} ({file_size // 1024} KB)")
+        mode_str = "lossless" if lossless else f"quality {quality}"
+        logger.debug(f"Saved WebP ({mode_str}): {output_path.name} ({file_size // 1024} KB)")
         return file_size
     except Exception as e:
         logger.error(f"Failed to save WebP {output_path}: {e}")

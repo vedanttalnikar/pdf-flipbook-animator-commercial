@@ -14,6 +14,7 @@ class Config:
     quality: int = 85  # WebP quality (1-100)
     jpg_quality: int = 90  # JPG fallback quality
     output_format: str = "webp"  # Primary image format
+    lossless_webp: bool = False  # Use lossless WebP (better text quality, larger files)
 
     # Flipbook settings
     title: str = "Flipbook"
