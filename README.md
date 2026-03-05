@@ -1,20 +1,17 @@
 # PDF Flipbook Animator
 
 [![Python Versions](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/License-Source--Available%20Commercial-red.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-0.2.0-green.svg)](CHANGELOG.md)
+[![Downloads](https://img.shields.io/github/downloads/vedanttalnikar/pdf-flipbook-animator-commercial/total)](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/releases)
 
-> **📢 Public Repository Notice:**  
-> This repository is **publicly visible for transparency and evaluation purposes only**.  
-> The code is **NOT open source** - it's commercial software with a source-available license.  
-> You can view and evaluate the code, but **a paid license is required for any production use**.  
-> See [LICENSE](LICENSE) for details.
-
-**Professional PDF to Flipbook Converter - Premium Animation Effects**
+**Free & Open Source PDF to Flipbook Converter**
 
 Transform any PDF into an interactive, web-based flipbook with stunning page-turning animations. Choose from simple transitions to realistic 3D page curl effects. Perfect for e-books, magazines, catalogs, and presentations.
 
-[🎬 **Live Demo** →](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/) | [💼 Buy Now](https://pdf-flipbook-animator.com/pricing) | [📖 Full Documentation](OUTPUT_USAGE_GUIDE.md) | [💬 Support](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
+✨ **No Python Required!** Download the Windows executable for instant use.
+
+[🎬 **Live Demo** →](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/) | [📥 **Windows Download** →](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/releases/latest) | [📖 Full Documentation](OUTPUT_USAGE_GUIDE.md) | [💬 Support](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
 
 ---
 
@@ -43,6 +40,7 @@ Transform any PDF into an interactive, web-based flipbook with stunning page-tur
 - 🖥️ **Fullscreen Mode** - Immersive reading experience
 - 💾 **Position Memory** - Remembers where you left off
 - 🔄 **Batch Processing** - Convert multiple PDFs at once
+- 💻 **Windows Executable** - No Python installation needed!
 
 ## 🎬 Live Demo
 
@@ -50,12 +48,14 @@ Transform any PDF into an interactive, web-based flipbook with stunning page-tur
 
 Experience a real 52-page magazine flipbook with **Realistic Mode**:
 - ✅ **Side panel layout** - Maximum vertical space for PDF viewing
-- ✅ **200 DPI resolution** - Crystal clear text and images
+- ✅ **250 DPI resolution** - Crystal clear text and images
+- ✅ **Lossless WebP** - Zero compression artifacts
+- ✅ **HTML Mode** - No canvas downscaling, perfect quality
 - ✅ **Fully responsive** - Auto-adapts to desktop/tablet/mobile
 - ✅ **Touch/swipe gestures** - Natural mobile interaction
 - ✅ **Keyboard navigation** - Arrow keys, Page Up/Down, Home/End
 - ✅ **Physics-based animation** - Realistic page curl with shadows
-- ✅ **58 MB total size** - High quality WebP optimized images
+- ✅ **High-DPI support** - Retina and 4K display optimization
 - ✅ **Works everywhere** - Phone, tablet, desktop browsers
 
 **Quick Start:**
@@ -64,41 +64,41 @@ pdf-flipbook convert book.pdf
 # ✅ Flipbook created at: output/book/
 ```
 
-## � Pricing & Licenses
-
-### Choose Your Plan
-
-| License Type | Users | Price | Features |
-|-------------|-------|-------|----------|
-| **Trial** | 1 user | Free (14 days) | All features, watermarked output |
-| **Personal** | 1 user | $49/year | All animation modes, unlimited conversions |
-| **Team** | 5 users | $199/year | Priority support, team collaboration |
-| **Enterprise** | Unlimited | $599/year | White-label, API access, dedicated support |
-
-[**Start Free Trial →**](https://pdf-flipbook-animator.com/trial) | [**View All Plans →**](https://pdf-flipbook-animator.com/pricing)
-
-### 30-Day Money-Back Guarantee
-Not satisfied? Get a full refund within 30 days of purchase.
-
----
-
 ## 📦 Installation
 
-### Requirements
+### Option 1: Windows Executable (Recommended - No Python Needed!)
 
-- Python 3.9+
-- Valid license key (get yours at [pdf-flipbook-animator.com](https://pdf-flipbook-animator.com))
+Perfect for Windows users who don't have Python installed:
 
-### Install via pip
+1. **Download**: Go to [Releases](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/releases/latest)
+2. **Extract**: Download `pdf-flipbook-windows.zip` and extract it
+3. **Run**: Open Command Prompt in the extracted folder
+
+```cmd
+pdf-flipbook.exe convert your-document.pdf
+```
+
+**System Requirements:**
+- Windows 10 or later
+- 64-bit system
+- ~70 MB disk space (includes all dependencies)
+
+### Option 2: Install via pip (Python Users)
+
+**Requirements:**
+- Python 3.9 or higher
+- pip (Python package manager)
 
 ```bash
 pip install pdf-flipbook-animator
 ```
 
-### Activate Your License
+### Option 3: Install from Source (Developers)
 
 ```bash
-pdf-flipbook activate YOUR-LICENSE-KEY
+git clone https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial.git
+cd pdf-flipbook-animator-commercial
+pip install -e .
 ```
 
 ## 🚀 Quick Start
@@ -106,6 +106,10 @@ pdf-flipbook activate YOUR-LICENSE-KEY
 ### Convert a PDF
 
 ```bash
+# Using Windows executable
+pdf-flipbook.exe convert your-document.pdf
+
+# Using Python installation
 pdf-flipbook convert your-document.pdf
 ```
 
@@ -128,8 +132,8 @@ Then visit [http://localhost:8000](http://localhost:8000)
 # Custom title and colors
 pdf-flipbook convert book.pdf --title "My Book" --primary-color "#FF5722"
 
-# High quality output
-pdf-flipbook convert document.pdf --dpi 200 --quality 95
+# High quality output (recommended)
+pdf-flipbook convert document.pdf --dpi 250 --lossless
 
 # Animation modes
 pdf-flipbook convert book.pdf --animation-mode simple      # Fast (default)
@@ -159,9 +163,10 @@ pdf-flipbook convert INPUT.pdf [OPTIONS]
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--output-dir, -o` | Output directory | `./output/<pdf-name>` |
-| `--dpi` | Image resolution (72-600) | `150` |
+| `--dpi` | Image resolution (72-600) | `250` (improved!) |
 | `--quality` | WebP quality (1-100) | `85` |
 | `--jpg-quality` | JPG fallback quality | `90` |
+| `--lossless` | Use lossless WebP (best for text) | `True` (improved!) |
 | `--title` | Flipbook title | PDF filename |
 | `--single-page` | Single page mode | `False` |
 | `--no-fullscreen` | Disable fullscreen button | `False` |
@@ -169,6 +174,8 @@ pdf-flipbook convert INPUT.pdf [OPTIONS]
 | `--animation-mode, -a` | Animation style: `simple`, `3d-css`, `realistic` | `simple` |
 | `--flip-duration` | Animation duration in ms (200-2000) | `800` |
 | `--enable-curl` | Enable 3D page curl (realistic mode) | `False` |
+| `--index-page` | Jump-to-index button target page | `2` |
+| `--no-index-button` | Disable jump-to-index button | `False` |
 
 ### Batch Processing
 
@@ -186,7 +193,7 @@ pdf-flipbook batch ./pdfs/
 pdf-flipbook batch ./pdfs/ --pattern "chapter*.pdf"
 
 # Custom output location
-pdf-flipbook batch ./pdfs/ -o ./flipbooks/ --dpi 200
+pdf-flipbook batch ./pdfs/ -o ./flipbooks/ --dpi 250 --lossless
 ```
 
 ### PDF Information
@@ -247,10 +254,14 @@ pdf-flipbook convert book.pdf --animation-mode 3d-css
 Full 3D page curl using the StPageFlip library. Physics-based animation with realistic shadows, page curl, and interactive dragging.
 
 ```bash
-pdf-flipbook convert book.pdf --animation-mode realistic --dpi 200 --quality 95
+pdf-flipbook convert book.pdf --animation-mode realistic --dpi 250 --lossless
 ```
 
 **NEW Features (v0.2.0):**
+- ✅ **HTML Mode** - No canvas downscaling, perfect text quality
+- ✅ **Device Pixel Ratio** - 2-3x sharper on Retina/4K displays
+- ✅ **250 DPI Default** - Increased from 150 for better clarity
+- ✅ **Lossless WebP** - Zero compression artifacts by default
 - ✅ **Side Panel Layout** - Maximizes vertical space (~99vh for PDF)
 - ✅ **Fully Responsive** - Auto-switches between single/two-page spread
 - ✅ **Dynamic Perspective** - 1200px (mobile), 1800px (tablet), 2400px (desktop)
@@ -259,8 +270,7 @@ pdf-flipbook convert book.pdf --animation-mode realistic --dpi 200 --quality 95
 - ✅ **Touch Optimized** - Swipe gestures on mobile devices
 - ✅ **Window Resize Handling** - Automatically reinitializes on orientation change
 - ✅ **Smart Navigation** - Buttons adapt to single-page or two-page mode
-- ✅ **High DPI Support** - Crisp rendering at 150-200 DPI
-- ✅ **Fullscreen Mode** - Semi-transparent side panels
+- ✅ **Jump to Index** - Quick access button to table of contents
 
 **Layout:**
 ```
@@ -282,22 +292,22 @@ pdf-flipbook convert book.pdf --animation-mode realistic --dpi 200 --quality 95
 
 **Comparison:**
 
-| Mode | Performance | Visual Effect | Layout | Responsive | Best For |
-|------|-------------|---------------|--------|------------|----------|
-| Simple | ⚡⚡⚡ 60 FPS | Basic fade | Traditional | Yes | Large PDFs, fast loading |
-| 3D CSS | ⚡⚡ 60 FPS | Page fold | Traditional | Yes | Balanced visual appeal |
-| Realistic | ⚡ 30-60 FPS | Realistic curl | **Side Panels** | **Fully Adaptive** | Professional publications |
+| Mode | Performance | Visual Effect | Quality | Best For |
+|------|-------------|---------------|---------|----------|
+| Simple | ⚡⚡⚡ 60 FPS | Basic fade | Good | Large PDFs, fast loading |
+| 3D CSS | ⚡⚡ 60 FPS | Page fold | Good | Balanced visual appeal |
+| Realistic | ⚡ 30-60 FPS | Realistic curl | **Excellent** | Professional publications |
 
 **Recommended Settings:**
 ```bash
-# Best quality for magazines/catalogs
-pdf-flipbook convert magazine.pdf -a realistic --dpi 200 --quality 95
+# Best quality for magazines/catalogs (default settings!)
+pdf-flipbook convert magazine.pdf -a realistic
 
-# Balanced quality/performance
-pdf-flipbook convert book.pdf -a realistic --dpi 150 --quality 90
+# Even higher quality
+pdf-flipbook convert book.pdf -a realistic --dpi 300 --lossless
 
-# Fast loading, good quality
-pdf-flipbook convert doc.pdf -a realistic --dpi 120 --quality 85
+# Balanced quality/file size
+pdf-flipbook convert doc.pdf -a realistic --dpi 200 --quality 90
 ```
 
 ## 📚 Output Structure
@@ -363,6 +373,8 @@ vercel deploy
 - 📊 Annual reports and presentations
 - 🎨 Design portfolios
 - 📰 Newsletters and catalogs
+- 📕 E-books and novels
+- 🎪 Event programs and brochures
 
 ## 🎨 Customization
 
@@ -376,18 +388,39 @@ pdf-flipbook convert doc.pdf --primary-color "#9C27B0"
 
 | DPI | Quality | Use Case | Avg Size/Page |
 |-----|---------|----------|---------------|
-| 96 | Low | Preview | ~200 KB |
-| 150 | **Recommended** | Web viewing | ~400 KB |
+| 120 | Low | Preview/draft | ~250 KB |
+| 150 | Good | Standard web | ~400 KB |
 | 200 | High | Detailed docs | ~700 KB |
-| 300 | Print | High detail | ~1.5 MB |
+| **250** | **Recommended** | **Default (best balance)** | **~1.2 MB** |
+| 300 | Very High | Print quality | ~1.8 MB |
+
+## 🔨 Building Windows Executable
+
+Want to build the executable yourself?
+
+```bash
+# Install PyInstaller
+pip install pyinstaller
+
+# Run the build script
+python build_executable.py
+
+# Test the executable
+cd dist/pdf-flipbook
+pdf-flipbook.exe --version
+```
+
+The build script creates:
+- `dist/pdf-flipbook/pdf-flipbook.exe` - Standalone executable
+- `pdf-flipbook-windows.zip` - Distribution package
 
 ## 🛠️ Development
 
 ### Setup
 
 ```bash
-git clone https://github.com/yourusername/pdf-flipbook-animator.git
-cd pdf-flipbook-animator
+git clone https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial.git
+cd pdf-flipbook-animator-commercial
 
 # Create virtual environment
 python -m venv venv
@@ -426,13 +459,14 @@ ruff check src/ tests/
 mypy src/
 ```
 
-## 📊 Project Status
+## 📊 Recent Improvements (v0.2.0+)
 
-- ✅ Core functionality complete
-- ✅ CLI interface finished
-- ✅ Comprehensive tests
-- ✅ Documentation complete
-- 🚧 Additional features planned (see [Issues](https://github.com/yourusername/pdf-flipbook-animator/issues))
+- ✅ **v0.6.0** - HTML mode eliminates canvas downscaling bottleneck
+- ✅ **v0.5.0** - Fixed CSS image-rendering for crisp text
+- ✅ **v0.4.0** - Added lossless WebP support
+- ✅ **v0.3.1** - Added jump-to-index button feature
+- ✅ **v0.3.0** - Improved defaults (250 DPI, lossless enabled)
+- ✅ **v0.2.0** - Device pixel ratio support for Retina/4K displays
 
 ## 🤝 Contributing
 
@@ -448,28 +482,34 @@ Contributions are welcome! Please see our [Contributing Guidelines](CONTRIBUTING
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+**Free for personal and commercial use!**
+
 ## 🙏 Acknowledgments
 
 - [PyMuPDF](https://pymupdf.readthedocs.io/) - Excellent PDF processing library
 - [Pillow](https://python-pillow.org/) - Powerful image manipulation
 - [Click](https://click.palletsprojects.com/) - Beautiful CLI framework
-- [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) - Gorgeous documentation
+- [StPageFlip](https://github.com/Nodlik/StPageFlip) - Realistic page flip library
 
 ## 📞 Support
 
 **Documentation:**
 - 📖 [Complete Output & Usage Guide](OUTPUT_USAGE_GUIDE.md) - Mobile, web, hosting, all API options
 - 📱 [Mobile Device Testing](MOBILE_TESTING.md) - Touch/swipe testing procedures
-- 💼 [Commercial Setup Guide](COMMERCIAL_SETUP.md) - Licensing and monetization
 - 📝 [Changelog](CHANGELOG.md) - Version history
+- 📥 [Windows Executable Releases](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/releases)
 
 **Community:**
-- 🐛 [Issue Tracker](https://github.com/yourusername/pdf-flipbook-animator/issues)
-- 💬 [Discussions](https://github.com/yourusername/pdf-flipbook-animator/discussions)
-- 📧 Email: support@pdf-flipbook-animator.com
+- 🐛 [Issue Tracker](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
+- 💬 [Discussions](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/discussions)
+- ⭐ Star this repo if you find it useful!
 
 ## 🗺️ Roadmap
 
+- [x] HTML mode for perfect text quality
+- [x] Device pixel ratio support
+- [x] Jump-to-index button
+- [x] Windows executable release
 - [ ] PDF.js integration for client-side rendering option
 - [ ] Thumbnail navigation sidebar
 - [ ] Search functionality
@@ -479,7 +519,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Progress statistics
 - [ ] Export to EPUB/other formats
 
-See the [open issues](https://github.com/yourusername/pdf-flipbook-animator/issues) for a full list of proposed features and known issues.
+See the [open issues](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues) for a full list of proposed features and known issues.
 
 ## ⭐ Star History
 
