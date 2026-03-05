@@ -46,6 +46,7 @@ class Flipbook {
     calculateResponsiveDimensions(aspectRatio) {
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
+        const pixelRatio = window.devicePixelRatio || 1;
         const isMobile = screenWidth < 768;
         const isTablet = screenWidth >= 768 && screenWidth < 1024;
         const isDesktop = screenWidth >= 1024;
@@ -89,15 +90,24 @@ class Flipbook {
             }
         }
 
+        // Scale dimensions for high-DPI displays
+        const scaledWidth = Math.floor(pageWidth * pixelRatio);
+        const scaledHeight = Math.floor(pageHeight * pixelRatio);
+
         console.log(`📱 Responsive dimensions calculated:`);
         console.log(`  Screen: ${screenWidth}x${screenHeight}`);
+        console.log(`  Pixel Ratio: ${pixelRatio}x`);
         console.log(`  Mode: ${isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop'}`);
-        console.log(`  Page: ${pageWidth}x${pageHeight}`);
+        console.log(`  Display size: ${pageWidth}x${pageHeight}`);
+        console.log(`  Canvas size: ${scaledWidth}x${scaledHeight}`);
         console.log(`  Available: ${availableWidth}x${availableHeight}`);
 
         return {
-            pageWidth,
-            pageHeight,
+            pageWidth: scaledWidth,
+            pageHeight: scaledHeight,
+            displayWidth: pageWidth,
+            displayHeight: pageHeight,
+            pixelRatio,
             isMobile,
             isTablet,
             isDesktop
@@ -203,8 +213,8 @@ class Flipbook {
         try {
             // Initialize StPageFlip with responsive dimensions
             this.pageFlip = new St.PageFlip(flipbookContainer, {
-                width: dimensions.pageWidth,
-                height: dimensions.pageHeight,
+                width: dimensions.displayWidth,
+                height: dimensions.displayHeight,
                 size: 'fixed',
                 minWidth: 315,
                 maxWidth: 2000,
@@ -226,20 +236,57 @@ class Flipbook {
                 disableFlipByClick: false
             });
 
-            // Load pages as HTML elements
-            this.pageFlip.loadFromImages(this.images);
+            // Create HTML pages for better quality (avoids canvas downscaling)
+            const pages = this.images.map((src, index) => {
+                const page = document.createElement('div');
+                page.className = 'stf__item';
+                page.innerHTML = `
+                    <img 
+                        src="${src}" 
+                        alt="Page ${index + 1}"
+                        style="width: 100%; height: 100%; object-fit: contain;"
+                        loading="${index < 4 ? 'eager' : 'lazy'}"
+                    />
+                `;
+                return page;
+            });
 
-            // Enable high-quality canvas image smoothing for sharp text
+            // Load pages as HTML elements (better quality than canvas)
+            this.pageFlip.loadFromHTML(pages);
+
+            // Diagnostic logging for quality verification
             setTimeout(() => {
+                // Get first image for dimension check
+                const firstImg = new Image();
+                firstImg.src = this.images[0];
+                firstImg.onload = () => {
+                    console.log('🔍 IMAGE QUALITY DIAGNOSTIC:');
+                    console.log(`  Source image: ${firstImg.naturalWidth}x${firstImg.naturalHeight}px`);
+                    console.log(`  Display size: ${dimensions.displayWidth}x${dimensions.displayHeight}px`);
+                    
+                    const downscaleRatio = firstImg.naturalWidth / dimensions.displayWidth;
+                    const pixelLoss = ((1 - (dimensions.displayWidth * dimensions.displayHeight) / (firstImg.naturalWidth * firstImg.naturalHeight)) * 100);
+                    
+                    console.log(`  Downscaling ratio: ${downscaleRatio.toFixed(2)}:1`);
+                    console.log(`  Pixel loss: ${pixelLoss.toFixed(1)}%`);
+                    console.log(`  Quality: ${pixelLoss < 50 ? '✅ Good' : pixelLoss < 75 ? '⚠️  Acceptable' : '❌ Poor'}`);
+                };
+
+                // Apply high-quality rendering to any canvas elements
                 const canvases = flipbookContainer.querySelectorAll('canvas');
-                canvases.forEach(canvas => {
-                    const ctx = canvas.getContext('2d');
-                    if (ctx) {
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-                    }
-                });
-            }, 100);
+                if (canvases.length > 0) {
+                    console.log(`📊 Found ${canvases.length} canvas elements, applying HQ smoothing`);
+                    canvases.forEach(canvas => {
+                        const ctx = canvas.getContext('2d');
+                        if (ctx) {
+                            ctx.imageSmoothingEnabled = true;
+                            ctx.imageSmoothingQuality = 'high';
+                        }
+                    });
+                } else {
+                    console.log('✅ Using HTML mode - no canvas downscaling');
+                }
+            }, 200);
 
             // Setup event listeners (only once)
             if (!this.isInitialized) {

@@ -10,11 +10,11 @@ class Config:
     """Configuration for PDF to flipbook conversion."""
 
     # PDF conversion settings
-    dpi: int = 150  # Image resolution
+    dpi: int = 250  # Image resolution (increased default for better text clarity)
     quality: int = 85  # WebP quality (1-100)
     jpg_quality: int = 90  # JPG fallback quality
     output_format: str = "webp"  # Primary image format
-    lossless_webp: bool = False  # Use lossless WebP (better text quality, larger files)
+    lossless_webp: bool = True  # Use lossless WebP (essential for text quality)
 
     # Flipbook settings
     title: str = "Flipbook"
