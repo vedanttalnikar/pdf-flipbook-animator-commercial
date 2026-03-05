@@ -367,8 +367,11 @@ body {{
 #stpageflip-container {{
     transform: translateZ(0);
     backface-visibility: hidden;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
+    /* High-quality image rendering for smooth text */
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-legibility;
+    image-rendering: high-quality;
+    -ms-interpolation-mode: bicubic;
 }}
 
 .page {{
@@ -395,9 +398,16 @@ body {{
     height: auto;
     object-fit: contain;
     display: block;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-    -ms-interpolation-mode: nearest-neighbor;
+    
+    /* High-quality image rendering for sharp text */
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-legibility;
+    image-rendering: high-quality;
+    -ms-interpolation-mode: bicubic;
+    
+    /* Font smoothing for text in images */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }}
 
 /* Loading Spinner */
@@ -667,8 +677,10 @@ body {{
     }}
 
     .page img {{
-        width: 100%;
+        max-width: 100%;
+        width: auto;
         height: auto;
+        object-fit: contain;
     }}
 
     /* Book spine shadow effect between pages */

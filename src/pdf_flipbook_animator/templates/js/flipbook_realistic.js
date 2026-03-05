@@ -229,6 +229,18 @@ class Flipbook {
             // Load pages as HTML elements
             this.pageFlip.loadFromImages(this.images);
 
+            // Enable high-quality canvas image smoothing for sharp text
+            setTimeout(() => {
+                const canvases = flipbookContainer.querySelectorAll('canvas');
+                canvases.forEach(canvas => {
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                    }
+                });
+            }, 100);
+
             // Setup event listeners (only once)
             if (!this.isInitialized) {
                 this.setupPageFlipEvents();

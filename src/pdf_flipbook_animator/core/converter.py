@@ -80,7 +80,13 @@ class PDFConverter:
         for page_num in range(doc.page_count):
             try:
                 page = doc[page_num]
-                pix = page.get_pixmap(matrix=mat, alpha=False)
+                # Enhanced rendering with explicit colorspace and annotations
+                pix = page.get_pixmap(
+                    matrix=mat,
+                    alpha=False,
+                    colorspace=fitz.csRGB,  # Explicit RGB for consistent quality
+                    annots=True  # Render annotations for better text
+                )
 
                 # Convert to PIL Image
                 img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
