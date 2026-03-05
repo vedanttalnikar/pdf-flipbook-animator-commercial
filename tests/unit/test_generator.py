@@ -42,7 +42,7 @@ def test_generate_html(temp_output_dir, mock_metadata):
     # Check HTML content
     html_content = html_path.read_text(encoding="utf-8")
     assert "Test Flipbook" in html_content
-    assert "Page 1 of 3" in html_content
+    assert 'id="total-pages">3' in html_content
     assert "page_001.webp" in html_content or "page_001" in html_content
 
 

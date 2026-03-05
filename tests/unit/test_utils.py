@@ -1,5 +1,6 @@
 """Unit tests for image utilities."""
 
+import random
 import pytest
 from pathlib import Path
 from PIL import Image
@@ -23,16 +24,19 @@ def test_convert_to_webp(sample_image, tmp_path):
     assert output_path.suffix == ".webp"
 
 
-def test_convert_to_webp_quality(sample_image, tmp_path):
+def test_convert_to_webp_quality(tmp_path):
     """Test WebP conversion with different quality settings."""
-    img = Image.open(sample_image)
-    
+    random.seed(42)
+    # Use an image with varied pixel data so quality level meaningfully affects file size
+    pixels = bytes([random.randint(0, 255) for _ in range(800 * 600 * 3)])
+    img = Image.frombytes("RGB", (800, 600), pixels)
+
     high_quality_path = tmp_path / "high.webp"
     low_quality_path = tmp_path / "low.webp"
-    
+
     high_size = convert_to_webp(img, high_quality_path, quality=95)
     low_size = convert_to_webp(img, low_quality_path, quality=50)
-    
+
     # Higher quality should result in larger file
     assert high_size > low_size
 
