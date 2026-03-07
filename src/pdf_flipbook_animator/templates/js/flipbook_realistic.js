@@ -1,6 +1,99 @@
 // PDF Flipbook Animator - Realistic Animation Mode
 // Using StPageFlip library for realistic 3D page curl effect
 
+// LinkOverlay Class - Manages clickable PDF links
+class LinkOverlay {
+    constructor(flipbook, linksData) {
+        this.flipbook = flipbook;
+        this.linksData = linksData || {};
+        this.overlayContainer = document.getElementById('link-overlay');
+        this.currentLinks = [];
+        
+        if (!this.overlayContainer) {
+            console.warn('Link overlay container not found');
+            return;
+        }
+        
+        console.log(`LinkOverlay initialized with links on ${Object.keys(this.linksData).length} pages`);
+    }
+    
+    renderLinksForPage(pageNum) {
+        if (!this.overlayContainer) return;
+        
+        // Clear existing links
+        this.clearLinks();
+        
+        const pageLinks = this.linksData[pageNum];
+        if (!pageLinks || pageLinks.length === 0) {
+            return;
+        }
+        
+        // Get flipbook container dimensions for positioning
+        const flipbookContainer = document.getElementById('flipbook');
+        if (!flipbookContainer) return;
+        
+        const containerRect = flipbookContainer.getBoundingClientRect();
+        
+        pageLinks.forEach((link, index) => {
+            const linkEl = document.createElement('a');
+            linkEl.className = 'pdf-link';
+            linkEl.dataset.targetPage = link.target_page;
+            linkEl.dataset.linkIndex = index;
+            
+            // Position using percentages for responsive behavior
+            linkEl.style.cssText = `
+                left: ${link.rect.x}%;
+                top: ${link.rect.y}%;
+                width: ${link.rect.width}%;
+                height: ${link.rect.height}%;
+            `;
+            
+            // Add click handler for internal links
+            if (link.type === 'internal') {
+                linkEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const targetPage = parseInt(link.target_page);
+                    console.log(`Link clicked: navigating to page ${targetPage}`);
+                    this.flipbook.goToPage(targetPage);
+                });
+                
+                // Add title for accessibility
+                linkEl.title = `Go to page ${link.target_page}`;
+            }
+            
+            this.overlayContainer.appendChild(linkEl);
+            this.currentLinks.push(linkEl);
+        });
+        
+        console.log(`Rendered ${pageLinks.length} links for page ${pageNum}`);
+    }
+    
+    clearLinks() {
+        if (this.overlayContainer) {
+            this.overlayContainer.innerHTML = '';
+        }
+        this.currentLinks = [];
+    }
+    
+    hide() {
+        if (this.overlayContainer) {
+            this.overlayContainer.classList.add('hidden');
+        }
+    }
+    
+    show() {
+        if (this.overlayContainer) {
+            this.overlayContainer.classList.remove('hidden');
+        }
+    }
+    
+    updateForCurrentPage() {
+        const currentPage = this.flipbook.currentPage;
+        this.renderLinksForPage(currentPage);
+    }
+}
+
 class Flipbook {
     constructor() {
         this.currentPage = 1;
@@ -13,6 +106,12 @@ class Flipbook {
         this.aspectRatio = null;
         this.isMobileMode = false; // Track if in mobile (single-page) mode
         this.indexPage = parseInt(document.getElementById('index-btn')?.dataset.indexPage || 2);
+        
+        // Zoom functionality
+        this.currentZoom = 1.0;
+        this.minZoom = 0.5;
+        this.maxZoom = 5.0;
+        this.zoomStep = 0.25;
         
         // Collect all image paths
         document.querySelectorAll('.page img').forEach(img => {
@@ -294,6 +393,19 @@ class Flipbook {
                 this.setupControls();
                 this.setupKeyboard();
                 
+                // Initialize link overlay
+                if (window.linksDataPromise) {
+                    window.linksDataPromise.then(linksData => {
+                        if (linksData) {
+                            this.linkOverlay = new LinkOverlay(this, linksData);
+                            this.linkOverlay.updateForCurrentPage();
+                        }
+                    });
+                } else if (window.linksData) {
+                    this.linkOverlay = new LinkOverlay(this, window.linksData);
+                    this.linkOverlay.updateForCurrentPage();
+                }
+                
                 // Only restore position if not a fresh start (startPage provided)
                 if (startPage > 0) {
                     this.restorePosition();
@@ -309,6 +421,11 @@ class Flipbook {
             }
 
             this.isInitialized = true;
+            
+            // Setup zoom functionality
+            this.setupZoom();
+            this.restoreZoom();
+            this.setupPan();
 
             // Hide loading spinner
             const loading = document.getElementById('loading');
@@ -331,6 +448,11 @@ class Flipbook {
             this.currentPage = e.data + 1;
             this.updateUI();
             this.savePosition();
+            
+            // Update link overlay for current page
+            if (this.linkOverlay) {
+                this.linkOverlay.updateForCurrentPage();
+            }
         });
 
         this.pageFlip.on('changeOrientation', (e) => {
@@ -339,6 +461,15 @@ class Flipbook {
 
         this.pageFlip.on('changeState', (e) => {
             console.log('State changed:', e.data);
+            
+            // Hide links during flip animation, show when settled
+            if (this.linkOverlay) {
+                if (e.data === 'flipping') {
+                    this.linkOverlay.hide();
+                } else if (e.data === 'read') {
+                    this.linkOverlay.show();
+                }
+            }
         });
     }
 
@@ -394,8 +525,328 @@ class Flipbook {
                     e.preventDefault();
                     this.toggleFullscreen();
                     break;
+                case '+':
+                case '=':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        this.zoomIn();
+                    }
+                    break;
+                case '-':
+                case '_':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        this.zoomOut();
+                    }
+                    break;
+                case '0':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        this.resetZoom();
+                    }
+                    break;
             }
         });
+    }
+
+    setupZoom() {
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        const zoomResetBtn = document.getElementById('zoom-reset-btn');
+        const flipbookContainer = document.getElementById('flipbook');
+        
+        if (zoomInBtn) {
+            zoomInBtn.addEventListener('click', () => this.zoomIn());
+        }
+        
+        if (zoomOutBtn) {
+            zoomOutBtn.addEventListener('click', () => this.zoomOut());
+        }
+        
+        if (zoomResetBtn) {
+            zoomResetBtn.addEventListener('click', () => this.resetZoom());
+        }
+        
+        // Mouse wheel zoom (Ctrl + Wheel)
+        if (flipbookContainer) {
+            flipbookContainer.addEventListener('wheel', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    if (e.deltaY < 0) {
+                        this.zoomIn();
+                    } else {
+                        this.zoomOut();
+                    }
+                }
+            }, { passive: false });
+            
+            // Pinch zoom for mobile
+            let initialDistance = 0;
+            let currentDistance = 0;
+            let isPinching = false;
+            
+            flipbookContainer.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    isPinching = true;
+                    e.preventDefault();
+                    initialDistance = this.getTouchDistance(e.touches[0], e.touches[1]);
+                }
+            }, { passive: false });
+            
+            flipbookContainer.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && isPinching) {
+                    e.preventDefault();
+                    currentDistance = this.getTouchDistance(e.touches[0], e.touches[1]);
+                    const delta = currentDistance - initialDistance;
+                    
+                    if (Math.abs(delta) > 10) {
+                        if (delta > 0) {
+                            this.zoomIn(0.1);
+                        } else {
+                            this.zoomOut(0.1);
+                        }
+                        initialDistance = currentDistance;
+                    }
+                }
+            }, { passive: false });
+            
+            flipbookContainer.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    isPinching = false;
+                }
+            });
+        }
+    }
+
+    getTouchDistance(touch1, touch2) {
+        const dx = touch1.clientX - touch2.clientX;
+        const dy = touch1.clientY - touch2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    zoomIn(step = this.zoomStep) {
+        this.setZoom(Math.min(this.currentZoom + step, this.maxZoom));
+    }
+
+    zoomOut(step = this.zoomStep) {
+        this.setZoom(Math.max(this.currentZoom - step, this.minZoom));
+    }
+
+    resetZoom() {
+        this.setZoom(1.0);
+    }
+
+    setZoom(zoomLevel) {
+        this.currentZoom = zoomLevel;
+        const flipbookContainer = document.getElementById('flipbook');
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+        const mainContainer = document.querySelector('.main');
+        
+        // Reset pan position when zoom changes
+        if (this.resetPanPosition) {
+            this.resetPanPosition();
+        }
+        
+        if (flipbookContainer) {
+            flipbookContainer.style.transform = `scale(${zoomLevel})`;
+            flipbookContainer.style.transformOrigin = 'center center';
+            
+            // Add/remove zoomed class for styling
+            if (zoomLevel > 1) {
+                flipbookContainer.classList.add('zoomed');
+                if (mainContainer) mainContainer.classList.add('zoomed');
+            } else {
+                flipbookContainer.classList.remove('zoomed');
+                if (mainContainer) mainContainer.classList.remove('zoomed');
+            }
+        }
+        
+        if (zoomLevelDisplay) {
+            zoomLevelDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+        
+        // Save zoom level
+        try {
+            localStorage.setItem('flipbook_zoom', zoomLevel.toString());
+        } catch (e) {
+            console.warn('Could not save zoom level:', e);
+        }
+        
+        console.log(`Zoom set to ${Math.round(zoomLevel * 100)}%`);
+    }
+
+    restoreZoom() {
+        try {
+            const savedZoom = localStorage.getItem('flipbook_zoom');
+            if (savedZoom) {
+                const zoomLevel = parseFloat(savedZoom);
+                if (zoomLevel >= this.minZoom && zoomLevel <= this.maxZoom) {
+                    this.setZoom(zoomLevel);
+                }
+            }
+        } catch (e) {
+            console.warn('Could not restore zoom:', e);
+        }
+    }
+
+    setupPan() {
+        const mainContainer = document.querySelector('.main');
+        const flipbookContainer = document.getElementById('flipbook');
+        if (!mainContainer || !flipbookContainer) return;
+        
+        let isPanning = false;
+        let hasMoved = false;
+        let startX = 0, startY = 0;
+        let initialX = 0, initialY = 0;
+        let currentPanX = 0, currentPanY = 0;
+        const moveThreshold = 5; // Minimum pixels to consider it a pan vs click
+        
+        // Track if user is currently panning (to prevent page flips)
+        this.isActivePan = false;
+        
+        // Mouse drag to pan when zoomed
+        mainContainer.addEventListener('mousedown', (e) => {
+            if (this.currentZoom <= 1) return; // Only pan when zoomed
+            
+            // Don't pan if clicking on buttons or links
+            if (e.target.closest('button, a, .zoom-btn, .icon-btn, .side-nav-btn')) return;
+            
+            isPanning = true;
+            hasMoved = false;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialX = e.clientX;
+            initialY = e.clientY;
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        mainContainer.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            
+            // Check if user has moved beyond threshold
+            const totalMoved = Math.sqrt(Math.pow(e.clientX - initialX, 2) + Math.pow(e.clientY - initialY, 2));
+            if (totalMoved > moveThreshold && !hasMoved) {
+                hasMoved = true;
+                this.isActivePan = true;
+                mainContainer.classList.add('panning');
+                flipbookContainer.classList.add('panning');
+            }
+            
+            if (hasMoved) {
+                currentPanX += deltaX;
+                currentPanY += deltaY;
+                
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                // Apply both zoom scale and pan translation
+                flipbookContainer.style.transform = `scale(${this.currentZoom}) translate(${currentPanX / this.currentZoom}px, ${currentPanY / this.currentZoom}px)`;
+            }
+        });
+        
+        mainContainer.addEventListener('mouseup', (e) => {
+            if (hasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            isPanning = false;
+            mainContainer.classList.remove('panning');
+            flipbookContainer.classList.remove('panning');
+            
+            // Delay resetting isActivePan to prevent immediate click events
+            setTimeout(() => {
+                this.isActivePan = false;
+            }, 100);
+        });
+        
+        mainContainer.addEventListener('mouseleave', () => {
+            isPanning = false;
+            hasMoved = false;
+            mainContainer.classList.remove('panning');
+            flipbookContainer.classList.remove('panning');
+            this.isActivePan = false;
+        });
+        
+        // Touch drag to pan when zoomed (single finger)
+        let touchStartX = 0, touchStartY = 0;
+        let touchInitialX = 0, touchInitialY = 0;
+        let isTouchPanning = false;
+        let touchHasMoved = false;
+        
+        mainContainer.addEventListener('touchstart', (e) => {
+            if (this.currentZoom <= 1) return;
+            if (e.touches.length !== 1) return; // Only single touch for panning
+            
+            // Don't pan if touching buttons
+            if (e.target.closest('button, a, .zoom-btn, .icon-btn, .side-nav-btn')) return;
+            
+            isTouchPanning = true;
+            touchHasMoved = false;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchInitialX = e.touches[0].clientX;
+            touchInitialY = e.touches[0].clientY;
+        }, { passive: false });
+        
+        mainContainer.addEventListener('touchmove', (e) => {
+            if (!isTouchPanning || e.touches.length !== 1) return;
+            
+            const deltaX = e.touches[0].clientX - touchStartX;
+            const deltaY = e.touches[0].clientY - touchStartY;
+            
+            // Check if user has moved beyond threshold
+            const totalMoved = Math.sqrt(Math.pow(e.touches[0].clientX - touchInitialX, 2) + Math.pow(e.touches[0].clientY - touchInitialY, 2));
+            if (totalMoved > moveThreshold && !touchHasMoved) {
+                touchHasMoved = true;
+                this.isActivePan = true;
+                mainContainer.classList.add('panning');
+                flipbookContainer.classList.add('panning');
+                e.preventDefault();
+            }
+            
+            if (touchHasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                currentPanX += deltaX;
+                currentPanY += deltaY;
+                
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                
+                flipbookContainer.style.transform = `scale(${this.currentZoom}) translate(${currentPanX / this.currentZoom}px, ${currentPanY / this.currentZoom}px)`;
+            }
+        }, { passive: false });
+        
+        mainContainer.addEventListener('touchend', (e) => {
+            if (touchHasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            isTouchPanning = false;
+            touchHasMoved = false;
+            mainContainer.classList.remove('panning');
+            flipbookContainer.classList.remove('panning');
+            
+            // Delay resetting to prevent immediate touch events
+            setTimeout(() => {
+                this.isActivePan = false;
+            }, 100);
+        });
+        
+        // Reset pan position when zoom changes
+        this.resetPanPosition = () => {
+            currentPanX = 0;
+            currentPanY = 0;
+        };
     }
 
     nextPage() {

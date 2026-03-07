@@ -28,6 +28,7 @@ class FlipbookGenerator:
         output_dir: Path,
         metadata: Dict[str, any],
         title: Optional[str] = None,
+        links_data: Optional[Dict[int, List[Dict]]] = None,
     ) -> Path:
         """Generate complete flipbook HTML viewer.
 
@@ -36,6 +37,7 @@ class FlipbookGenerator:
             output_dir: Root output directory
             metadata: Conversion metadata from PDFConverter
             title: Optional title for the flipbook
+            links_data: Optional dictionary of clickable links per page
 
         Returns:
             Path to generated index.html
@@ -52,9 +54,18 @@ class FlipbookGenerator:
 
         # Get template directory
         template_dir = self._get_template_dir()
+        
+        # Export links data if provided
+        if links_data:
+            links_json_path = output_dir / "links_data.json"
+            links_json_path.write_text(
+                json.dumps(links_data, indent=2),
+                encoding="utf-8"
+            )
+            logger.info(f"Exported links data: {len(links_data)} pages with links")
 
         # Generate HTML
-        html_content = self._generate_html(title, images, page_count, metadata)
+        html_content = self._generate_html(title, images, page_count, metadata, links_data)
         html_path = output_dir / "index.html"
         html_path.write_text(html_content, encoding="utf-8")
         logger.info(f"Generated: {html_path}")
@@ -96,7 +107,7 @@ class FlipbookGenerator:
             return pkg_dir / "templates"
 
     def _generate_html(
-        self, title: str, images: List[str], page_count: int, metadata: Dict
+        self, title: str, images: List[str], page_count: int, metadata: Dict, links_data: Optional[Dict] = None
     ) -> str:
         """Generate HTML content."""
         # Build image list
@@ -117,7 +128,7 @@ class FlipbookGenerator:
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=1.0">
     <meta name="description" content="{title} - Interactive PDF Flipbook">
     <meta property="og:title" content="{title}">
     <meta property="og:description" content="Interactive flipbook with {page_count} pages">
@@ -132,7 +143,6 @@ class FlipbookGenerator:
         <aside class="left-panel">
             <button id="prev-btn" class="side-nav-btn" title="Previous Page (← or ↑)">
                 <span class="arrow">←</span>
-                <span class="label">Previous</span>
             </button>
         </aside>
 
@@ -141,6 +151,9 @@ class FlipbookGenerator:
             <div id="flipbook" class="flipbook">
 {images_html}
             </div>
+            
+            <!-- Link overlay for clickable PDF links -->
+            <div id="link-overlay"></div>
             
             <div class="loading-spinner" id="loading">
                 <div class="spinner"></div>
@@ -156,6 +169,19 @@ class FlipbookGenerator:
                 {'<button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen (F)">⛶</button>' if self.config.enable_fullscreen else ''}
             </div>
             
+            <div class="zoom-controls">
+                <button id="zoom-out-btn" class="zoom-btn" title="Zoom Out (Ctrl+-)">
+                    <span>−</span>
+                </button>
+                <span id="zoom-level" class="zoom-level">100%</span>
+                <button id="zoom-in-btn" class="zoom-btn" title="Zoom In (Ctrl++)">
+                    <span>+</span>
+                </button>
+                <button id="zoom-reset-btn" class="zoom-btn" title="Reset Zoom (Ctrl+0)">
+                    <span>⟲</span>
+                </button>
+            </div>
+            
             <div class="page-info">
                 <span class="page-indicator">
                     <span id="current-page">1</span> / <span id="total-pages">{page_count}</span>
@@ -163,7 +189,6 @@ class FlipbookGenerator:
             </div>
             
             <button id="next-btn" class="side-nav-btn" title="Next Page (→ or ↓)">
-                <span class="label">Next</span>
                 <span class="arrow">→</span>
             </button>
             
@@ -181,6 +206,14 @@ class FlipbookGenerator:
         </aside>
     </div>
 
+    <!-- Load links data if available -->
+    <script>
+        // Load links data asynchronously
+        window.linksDataPromise = fetch('links_data.json')
+            .then(response => response.ok ? response.json() : null)
+            .then(data => {{ window.linksData = data; return data; }})
+            .catch(() => null);
+    </script>
     <script src="js/flipbook.js"></script>
 </body>
 </html>
@@ -257,18 +290,15 @@ body {{
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px;
+    padding: 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
     transition: var(--transition);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    min-height: 80px;
+    justify-content: center;
     width: 100%;
+    min-height: 60px;
 }}
 
 .side-nav-btn:hover:not(:disabled) {{
@@ -283,14 +313,8 @@ body {{
 }}
 
 .side-nav-btn .arrow {{
-    font-size: 1.5rem;
+    font-size: 2rem;
     line-height: 1;
-}}
-
-.side-nav-btn .label {{
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }}
 
 /* Panel Header */
@@ -351,6 +375,14 @@ body {{
     overflow: hidden;
 }}
 
+.main.zoomed {{
+    cursor: grab;
+}}
+
+.main.panning {{
+    cursor: grabbing;
+}}
+
 .flipbook {{
     width: auto;
     height: auto;
@@ -408,6 +440,94 @@ body {{
     /* Font smoothing for text in images */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}}
+
+/* Link Overlay - Clickable PDF Links */
+#link-overlay {{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}}
+
+.pdf-link {{
+    position: absolute;
+    cursor: {self.config.link_cursor};
+    pointer-events: auto;
+    transition: background-color 0.2s ease;
+    border-radius: 2px;
+}}
+
+.pdf-link:hover {{
+    background-color: {self.config.link_hover_color};
+}}
+
+.pdf-link:active {{
+    background-color: rgba(33, 150, 243, 0.3);
+}}
+
+/* Hide links during page flip animation */
+#link-overlay.hidden {{
+    opacity: 0;
+    pointer-events: none;
+}}
+
+/* Zoom Controls */
+.zoom-controls {{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-top: 10px;
+}}
+
+.zoom-btn {{
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: var(--transition);
+    min-width: 36px;
+}}
+
+.zoom-btn:hover {{
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}}
+
+.zoom-btn:active {{
+    transform: scale(0.95);
+}}
+
+.zoom-level {{
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: center;
+    color: var(--text-color);
+}}
+
+.flipbook.zoomed {{
+    cursor: grab;
+}}
+
+.flipbook.panning {{
+    cursor: grabbing;
+    pointer-events: none;
+}}
+
+.page {{
+    touch-action: pan-x pan-y pinch-zoom;
+    user-select: none;
 }}
 
 /* Loading Spinner */
