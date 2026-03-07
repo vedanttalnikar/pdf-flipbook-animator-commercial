@@ -131,6 +131,11 @@ def cli(verbose: bool, quiet: bool):
     is_flag=True,
     help="Disable jump-to-index button",
 )
+@click.option(
+    "--preserve-links",
+    is_flag=True,
+    help="Preserve clickable PDF links for navigation (e.g., table of contents)",
+)
 def convert(
     pdf_path: Path,
     output_dir: Optional[Path],
@@ -147,6 +152,7 @@ def convert(
     enable_curl: bool,
     index_page: int,
     no_index_button: bool,
+    preserve_links: bool,
 ):
     """Convert a PDF to an animated flipbook.
 
@@ -187,6 +193,7 @@ def convert(
             output_dir=output_dir,
             enable_index_button=not no_index_button,
             index_page=index_page,
+            preserve_links=preserve_links,
         )
 
         click.echo(f"\n📄 Converting PDF: {click.style(pdf_path.name, fg='cyan', bold=True)}")
@@ -202,6 +209,20 @@ def convert(
             f"✅ Converted {click.style(str(metadata['page_count']), fg='green', bold=True)} pages "
             f"({metadata['total_size_mb']} MB total)\n"
         )
+        
+        # Extract links if enabled
+        links_data = None
+        if preserve_links:
+            click.echo("🔗 Extracting PDF links...")
+            links_data = converter.extract_links(pdf_path)
+            if links_data:
+                total_links = sum(len(links) for links in links_data.values())
+                click.echo(
+                    f"✅ Found {click.style(str(total_links), fg='green', bold=True)} clickable links "
+                    f"on {len(links_data)} pages\n"
+                )
+            else:
+                click.echo("ℹ️  No internal links found in PDF\n")
 
         # Step 2: Generate HTML flipbook
         click.echo("🔄 Step 2/2: Generating flipbook viewer...")
@@ -211,6 +232,7 @@ def convert(
             output_dir,
             metadata,
             title,
+            links_data=links_data,
         )
 
         click.echo(f"✅ Generated HTML viewer\n")

@@ -15,6 +15,11 @@ class Config:
     jpg_quality: int = 90  # JPG fallback quality
     output_format: str = "webp"  # Primary image format
     lossless_webp: bool = True  # Use lossless WebP (essential for text quality)
+    
+    # Link preservation settings
+    preserve_links: bool = False  # Extract and render clickable PDF links
+    link_hover_color: str = "rgba(33, 150, 243, 0.2)"  # Highlight color on hover
+    link_cursor: str = "pointer"  # CSS cursor style for links
 
     # Flipbook settings
     title: str = "Flipbook"

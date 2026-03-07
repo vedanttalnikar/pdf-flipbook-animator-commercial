@@ -141,6 +141,93 @@ class PDFConverter:
 
         return metadata
 
+    def extract_links(self, pdf_path: Path) -> Dict[int, List[Dict[str, any]]]:
+        """Extract internal page links from PDF.
+        
+        Args:
+            pdf_path: Path to input PDF file
+            
+        Returns:
+            Dictionary mapping page numbers (1-based) to lists of link objects:
+            {
+                1: [
+                    {
+                        'type': 'internal',
+                        'target_page': 5,
+                        'rect': {
+                            'x': 10.5,      # percentage
+                            'y': 20.3,      # percentage
+                            'width': 15.2,  # percentage
+                            'height': 2.8   # percentage
+                        }
+                    }
+                ]
+            }
+        """
+        if not pdf_path.exists():
+            raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+        
+        logger.info(f"Extracting links from: {pdf_path}")
+        
+        try:
+            doc = fitz.open(pdf_path)
+        except Exception as e:
+            raise ValueError(f"Failed to open PDF: {e}")
+        
+        links_data = {}
+        total_links = 0
+        internal_links = 0
+        
+        for page_num in range(doc.page_count):
+            page = doc[page_num]
+            page_links = page.get_links()
+            
+            if not page_links:
+                continue
+            
+            extracted_links = []
+            
+            for link in page_links:
+                # Only process internal page navigation links
+                if link.get('kind') == fitz.LINK_GOTO:
+                    total_links += 1
+                    internal_links += 1
+                    
+                    dest_page = link.get('page', -1)
+                    if dest_page < 0:
+                        continue  # Skip invalid destinations
+                    
+                    # Get link rectangle
+                    link_rect = link['from']
+                    
+                    # Convert to percentages for responsive positioning
+                    rect_data = {
+                        'x': (link_rect.x0 / page.rect.width) * 100,
+                        'y': (link_rect.y0 / page.rect.height) * 100,
+                        'width': ((link_rect.x1 - link_rect.x0) / page.rect.width) * 100,
+                        'height': ((link_rect.y1 - link_rect.y0) / page.rect.height) * 100,
+                    }
+                    
+                    link_data = {
+                        'type': 'internal',
+                        'target_page': dest_page + 1,  # Convert to 1-based
+                        'rect': rect_data,
+                    }
+                    
+                    extracted_links.append(link_data)
+            
+            if extracted_links:
+                links_data[page_num + 1] = extracted_links  # Store with 1-based page number
+        
+        doc.close()
+        
+        logger.info(
+            f"Link extraction complete: {internal_links} internal links found "
+            f"on {len(links_data)} pages"
+        )
+        
+        return links_data
+
     def get_pdf_info(self, pdf_path: Path) -> Dict[str, any]:
         """Get basic information about a PDF file.
 
