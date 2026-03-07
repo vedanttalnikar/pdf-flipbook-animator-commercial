@@ -66,18 +66,15 @@ body {
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px;
+    padding: 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
     transition: var(--transition);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    min-height: 80px;
+    justify-content: center;
     width: 100%;
+    min-height: 60px;
 }
 
 .side-nav-btn:hover:not(:disabled) {
@@ -92,14 +89,8 @@ body {
 }
 
 .side-nav-btn .arrow {
-    font-size: 1.5rem;
+    font-size: 2rem;
     line-height: 1;
-}
-
-.side-nav-btn .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 /* Panel Header */
@@ -160,6 +151,14 @@ body {
     overflow: hidden;
 }
 
+.main.zoomed {
+    cursor: grab;
+}
+
+.main.panning {
+    cursor: grabbing;
+}
+
 .flipbook {
     width: auto;
     height: auto;
@@ -217,6 +216,94 @@ body {
     /* Font smoothing for text in images */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* Link Overlay - Clickable PDF Links */
+#link-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.pdf-link {
+    position: absolute;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background-color 0.2s ease;
+    border-radius: 2px;
+}
+
+.pdf-link:hover {
+    background-color: rgba(33, 150, 243, 0.2);
+}
+
+.pdf-link:active {
+    background-color: rgba(33, 150, 243, 0.3);
+}
+
+/* Hide links during page flip animation */
+#link-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Zoom Controls */
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-top: 10px;
+}
+
+.zoom-btn {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: var(--transition);
+    min-width: 36px;
+}
+
+.zoom-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.05);
+}
+
+.zoom-btn:active {
+    transform: scale(0.95);
+}
+
+.zoom-level {
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: center;
+    color: var(--text-color);
+}
+
+.flipbook.zoomed {
+    cursor: grab;
+}
+
+.flipbook.panning {
+    cursor: grabbing;
+    pointer-events: none;
+}
+
+.page {
+    touch-action: pan-x pan-y pinch-zoom;
+    user-select: none;
 }
 
 /* Loading Spinner */

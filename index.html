@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0, minimum-scale=1.0">
     <meta name="description" content="January 2026 Patrabhet - Interactive PDF Flipbook">
     <meta property="og:title" content="January 2026 Patrabhet">
     <meta property="og:description" content="Interactive flipbook with 52 pages">
@@ -17,7 +17,6 @@
         <aside class="left-panel">
             <button id="prev-btn" class="side-nav-btn" title="Previous Page (← or ↑)">
                 <span class="arrow">←</span>
-                <span class="label">Previous</span>
             </button>
         </aside>
 
@@ -182,6 +181,9 @@
         </div>
             </div>
             
+            <!-- Link overlay for clickable PDF links -->
+            <div id="link-overlay"></div>
+            
             <div class="loading-spinner" id="loading">
                 <div class="spinner"></div>
                 <p>Loading flipbook...</p>
@@ -196,6 +198,19 @@
                 <button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen (F)">⛶</button>
             </div>
             
+            <div class="zoom-controls">
+                <button id="zoom-out-btn" class="zoom-btn" title="Zoom Out (Ctrl+-)">
+                    <span>−</span>
+                </button>
+                <span id="zoom-level" class="zoom-level">100%</span>
+                <button id="zoom-in-btn" class="zoom-btn" title="Zoom In (Ctrl++)">
+                    <span>+</span>
+                </button>
+                <button id="zoom-reset-btn" class="zoom-btn" title="Reset Zoom (Ctrl+0)">
+                    <span>⟲</span>
+                </button>
+            </div>
+            
             <div class="page-info">
                 <span class="page-indicator">
                     <span id="current-page">1</span> / <span id="total-pages">52</span>
@@ -203,7 +218,6 @@
             </div>
             
             <button id="next-btn" class="side-nav-btn" title="Next Page (→ or ↓)">
-                <span class="label">Next</span>
                 <span class="arrow">→</span>
             </button>
             
@@ -221,6 +235,14 @@
         </aside>
     </div>
 
+    <!-- Load links data if available -->
+    <script>
+        // Load links data asynchronously
+        window.linksDataPromise = fetch('links_data.json')
+            .then(response => response.ok ? response.json() : null)
+            .then(data => { window.linksData = data; return data; })
+            .catch(() => null);
+    </script>
     <script src="js/flipbook.js"></script>
 </body>
 </html>
