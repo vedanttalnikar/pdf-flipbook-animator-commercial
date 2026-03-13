@@ -37,7 +37,6 @@ class LinkOverlay {
         pageLinks.forEach((link, index) => {
             const linkEl = document.createElement('a');
             linkEl.className = 'pdf-link';
-            linkEl.dataset.targetPage = link.target_page;
             linkEl.dataset.linkIndex = index;
             
             // Position using percentages for responsive behavior
@@ -48,18 +47,26 @@ class LinkOverlay {
                 height: ${link.rect.height}%;
             `;
             
-            // Add click handler for internal links
+            // Add click handler based on link type
             if (link.type === 'internal') {
+                linkEl.dataset.targetPage = link.target_page;
                 linkEl.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     const targetPage = parseInt(link.target_page);
-                    console.log(`Link clicked: navigating to page ${targetPage}`);
+                    console.log(`Internal link clicked: navigating to page ${targetPage}`);
                     this.flipbook.goToPage(targetPage);
                 });
-                
-                // Add title for accessibility
                 linkEl.title = `Go to page ${link.target_page}`;
+            } else if (link.type === 'external') {
+                linkEl.href = link.url;
+                linkEl.target = '_blank';
+                linkEl.rel = 'noopener noreferrer';
+                linkEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    console.log(`External link clicked: opening ${link.url}`);
+                });
+                linkEl.title = link.url;
             }
             
             this.overlayContainer.appendChild(linkEl);
@@ -91,6 +98,173 @@ class LinkOverlay {
     updateForCurrentPage() {
         const currentPage = this.flipbook.currentPage;
         this.renderLinksForPage(currentPage);
+    }
+}
+
+// TocDrawer Class - Slide-out Table of Contents sidebar
+class TocDrawer {
+    constructor(flipbook, tocData) {
+        this.flipbook = flipbook;
+        this.tocData = tocData || [];
+        this.drawer = document.getElementById('toc-drawer');
+        this.backdrop = document.getElementById('toc-backdrop');
+        this.tocList = document.getElementById('toc-list');
+        this.searchInput = document.getElementById('toc-search-input');
+        this.isOpen = false;
+        this.items = [];
+
+        if (!this.drawer || !this.tocList || this.tocData.length === 0) {
+            console.warn('TOC drawer: missing elements or empty data');
+            return;
+        }
+
+        this.renderToc();
+        this.setupEvents();
+        console.log(`TocDrawer initialized with ${this.tocData.length} entries`);
+    }
+
+    renderToc() {
+        this.tocList.innerHTML = '';
+        this.items = [];
+
+        this.tocData.forEach((entry, index) => {
+            const li = document.createElement('li');
+            li.className = 'toc-item';
+            li.dataset.level = entry.level;
+            li.dataset.page = entry.page;
+            li.dataset.index = index;
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'toc-item-title';
+            titleSpan.textContent = entry.title;
+
+            const pageSpan = document.createElement('span');
+            pageSpan.className = 'toc-item-page';
+            pageSpan.textContent = `p.${entry.page}`;
+
+            li.appendChild(titleSpan);
+            li.appendChild(pageSpan);
+
+            li.addEventListener('click', () => {
+                this.flipbook.goToPage(entry.page);
+                this.highlightActive(entry.page);
+                // Close drawer after short delay for visual feedback
+                setTimeout(() => this.close(), 250);
+            });
+
+            this.tocList.appendChild(li);
+            this.items.push({ element: li, entry });
+        });
+    }
+
+    setupEvents() {
+        // Toggle button
+        const tocBtn = document.getElementById('toc-btn');
+        if (tocBtn) {
+            tocBtn.addEventListener('click', () => this.toggle());
+        }
+
+        // Close button
+        const closeBtn = document.getElementById('toc-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.close());
+        }
+
+        // Backdrop click
+        if (this.backdrop) {
+            this.backdrop.addEventListener('click', () => this.close());
+        }
+
+        // Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) {
+                this.close();
+            }
+        });
+
+        // Search filter
+        if (this.searchInput) {
+            this.searchInput.addEventListener('input', () => this.filterToc());
+        }
+    }
+
+    filterToc() {
+        const query = this.searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        this.items.forEach(({ element, entry }) => {
+            if (!query || entry.title.toLowerCase().includes(query) || String(entry.page).includes(query)) {
+                element.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                element.classList.add('hidden');
+            }
+        });
+
+        // Show "no results" message
+        const existing = this.tocList.querySelector('.toc-no-results');
+        if (visibleCount === 0 && query) {
+            if (!existing) {
+                const noResults = document.createElement('li');
+                noResults.className = 'toc-no-results';
+                noResults.textContent = 'No matching chapters found';
+                this.tocList.appendChild(noResults);
+            }
+        } else if (existing) {
+            existing.remove();
+        }
+    }
+
+    highlightActive(pageNum) {
+        // Find the closest TOC entry at or before the current page
+        let activeEntry = null;
+        for (let i = this.items.length - 1; i >= 0; i--) {
+            if (this.items[i].entry.page <= pageNum) {
+                activeEntry = this.items[i];
+                break;
+            }
+        }
+
+        // Remove all active states
+        this.items.forEach(({ element }) => element.classList.remove('active'));
+
+        // Set active
+        if (activeEntry) {
+            activeEntry.element.classList.add('active');
+            // Scroll into view if drawer is open
+            if (this.isOpen) {
+                activeEntry.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    }
+
+    updateForCurrentPage() {
+        this.highlightActive(this.flipbook.currentPage);
+    }
+
+    open() {
+        this.isOpen = true;
+        if (this.drawer) this.drawer.classList.add('visible');
+        if (this.backdrop) this.backdrop.classList.add('visible');
+        this.highlightActive(this.flipbook.currentPage);
+        // Focus search input
+        if (this.searchInput) {
+            setTimeout(() => this.searchInput.focus(), 350);
+        }
+    }
+
+    close() {
+        this.isOpen = false;
+        if (this.drawer) this.drawer.classList.remove('visible');
+        if (this.backdrop) this.backdrop.classList.remove('visible');
+    }
+
+    toggle() {
+        if (this.isOpen) {
+            this.close();
+        } else {
+            this.open();
+        }
     }
 }
 
@@ -251,9 +425,6 @@ class Flipbook {
             this.pageFlip = null;
         }
         
-        // Mark as not initialized
-        this.isInitialized = false;
-        
         // Reinitialize with new dimensions
         setTimeout(() => {
             this.initializeFlipbook(this.aspectRatio, savedPage - 1);
@@ -387,9 +558,11 @@ class Flipbook {
                 }
             }, 200);
 
-            // Setup event listeners (only once)
+            // Always setup page flip events for the new StPageFlip instance
+            this.setupPageFlipEvents();
+
+            // Setup controls & keyboard only once (avoid duplicates on reinitialize)
             if (!this.isInitialized) {
-                this.setupPageFlipEvents();
                 this.setupControls();
                 this.setupKeyboard();
                 
@@ -406,6 +579,19 @@ class Flipbook {
                     this.linkOverlay.updateForCurrentPage();
                 }
                 
+                // Initialize TOC drawer
+                if (window.tocDataPromise) {
+                    window.tocDataPromise.then(tocData => {
+                        if (tocData && tocData.length > 0) {
+                            this.tocDrawer = new TocDrawer(this, tocData);
+                            this.tocDrawer.updateForCurrentPage();
+                        }
+                    });
+                } else if (window.tocData && window.tocData.length > 0) {
+                    this.tocDrawer = new TocDrawer(this, window.tocData);
+                    this.tocDrawer.updateForCurrentPage();
+                }
+                
                 // Only restore position if not a fresh start (startPage provided)
                 if (startPage > 0) {
                     this.restorePosition();
@@ -420,12 +606,14 @@ class Flipbook {
                 this.updateUI();
             }
 
+            // Setup zoom/pan only once (avoid duplicate listeners on reinitialize)
+            if (!this.isInitialized) {
+                this.setupZoom();
+                this.restoreZoom();
+                this.setupPan();
+            }
+
             this.isInitialized = true;
-            
-            // Setup zoom functionality
-            this.setupZoom();
-            this.restoreZoom();
-            this.setupPan();
 
             // Hide loading spinner
             const loading = document.getElementById('loading');
@@ -452,6 +640,11 @@ class Flipbook {
             // Update link overlay for current page
             if (this.linkOverlay) {
                 this.linkOverlay.updateForCurrentPage();
+            }
+            
+            // Update TOC active highlight
+            if (this.tocDrawer) {
+                this.tocDrawer.updateForCurrentPage();
             }
         });
 
@@ -853,18 +1046,7 @@ class Flipbook {
         if (!this.pageFlip) return;
         
         try {
-            // Get the actual current page index from StPageFlip (0-based)
-            const currentIndex = this.pageFlip.getCurrentPageIndex();
-            
-            // In two-page spread mode (desktop/tablet), we need to skip by 2
-            // In single-page mode (mobile), we skip by 1
-            const increment = this.isMobileMode ? 1 : 2;
-            const nextIndex = currentIndex + increment;
-            
-            // Check if we can move forward
-            if (nextIndex < this.totalPages) {
-                this.pageFlip.flip(nextIndex);
-            }
+            this.pageFlip.flipNext();
         } catch (e) {
             console.warn('Error in nextPage:', e);
         }
@@ -874,18 +1056,7 @@ class Flipbook {
         if (!this.pageFlip) return;
         
         try {
-            // Get the actual current page index from StPageFlip (0-based)
-            const currentIndex = this.pageFlip.getCurrentPageIndex();
-            
-            // In two-page spread mode (desktop/tablet), we need to skip by 2
-            // In single-page mode (mobile), we skip by 1
-            const decrement = this.isMobileMode ? 1 : 2;
-            const prevIndex = currentIndex - decrement;
-            
-            // Check if we can move backward
-            if (prevIndex >= 0) {
-                this.pageFlip.flip(prevIndex);
-            }
+            this.pageFlip.flipPrev();
         } catch (e) {
             console.warn('Error in previousPage:', e);
         }
