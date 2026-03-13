@@ -29,6 +29,7 @@ class FlipbookGenerator:
         metadata: Dict[str, any],
         title: Optional[str] = None,
         links_data: Optional[Dict[int, List[Dict]]] = None,
+        toc_data: Optional[List[Dict]] = None,
     ) -> Path:
         """Generate complete flipbook HTML viewer.
 
@@ -38,6 +39,7 @@ class FlipbookGenerator:
             metadata: Conversion metadata from PDFConverter
             title: Optional title for the flipbook
             links_data: Optional dictionary of clickable links per page
+            toc_data: Optional list of TOC entries for sidebar navigation
 
         Returns:
             Path to generated index.html
@@ -64,8 +66,17 @@ class FlipbookGenerator:
             )
             logger.info(f"Exported links data: {len(links_data)} pages with links")
 
+        # Export TOC data if provided
+        if toc_data:
+            toc_json_path = output_dir / "toc_data.json"
+            toc_json_path.write_text(
+                json.dumps(toc_data, indent=2, ensure_ascii=False),
+                encoding="utf-8"
+            )
+            logger.info(f"Exported TOC data: {len(toc_data)} entries")
+
         # Generate HTML
-        html_content = self._generate_html(title, images, page_count, metadata, links_data)
+        html_content = self._generate_html(title, images, page_count, metadata, links_data, toc_data)
         html_path = output_dir / "index.html"
         html_path.write_text(html_content, encoding="utf-8")
         logger.info(f"Generated: {html_path}")
@@ -107,7 +118,7 @@ class FlipbookGenerator:
             return pkg_dir / "templates"
 
     def _generate_html(
-        self, title: str, images: List[str], page_count: int, metadata: Dict, links_data: Optional[Dict] = None
+        self, title: str, images: List[str], page_count: int, metadata: Dict, links_data: Optional[Dict] = None, toc_data: Optional[List[Dict]] = None
     ) -> str:
         """Generate HTML content."""
         # Build image list
@@ -165,6 +176,7 @@ class FlipbookGenerator:
         <aside class="right-panel">
             <div class="panel-header">
                 <h1 class="title">{title}</h1>
+                {'<button id="toc-btn" class="icon-btn" title="Table of Contents">📋</button>' if toc_data else ''}
                 {'<button id="index-btn" class="icon-btn" title="Jump to Index (Page ' + str(self.config.index_page) + ')" data-index-page="' + str(self.config.index_page) + '">📑</button>' if self.config.enable_index_button and page_count >= self.config.index_page else ''}
                 {'<button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen (F)">⛶</button>' if self.config.enable_fullscreen else ''}
             </div>
@@ -206,12 +218,22 @@ class FlipbookGenerator:
         </aside>
     </div>
 
+    <!-- TOC Drawer -->
+    {'<div id="toc-backdrop" class="toc-backdrop"></div>' if toc_data else ''}
+    {'<div id="toc-drawer" class="toc-drawer"><div class="toc-header"><h2>📋 Table of Contents</h2><button id="toc-close-btn" class="toc-close-btn">&times;</button></div><div class="toc-search"><input type="text" id="toc-search-input" placeholder="Search chapters..." autocomplete="off"></div><ul id="toc-list" class="toc-list"></ul></div>' if toc_data else ''}
+
     <!-- Load links data if available -->
     <script>
         // Load links data asynchronously
         window.linksDataPromise = fetch('links_data.json')
             .then(response => response.ok ? response.json() : null)
             .then(data => {{ window.linksData = data; return data; }})
+            .catch(() => null);
+        
+        // Load TOC data asynchronously
+        window.tocDataPromise = fetch('toc_data.json')
+            .then(response => response.ok ? response.json() : null)
+            .then(data => {{ window.tocData = data; return data; }})
             .catch(() => null);
     </script>
     <script src="js/flipbook.js"></script>
@@ -473,6 +495,205 @@ body {{
 #link-overlay.hidden {{
     opacity: 0;
     pointer-events: none;
+}}
+
+/* TOC Drawer */
+.toc-backdrop {{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}}
+
+.toc-backdrop.visible {{
+    opacity: 1;
+    pointer-events: auto;
+}}
+
+.toc-drawer {{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 360px;
+    max-width: 85vw;
+    height: 100vh;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    z-index: 2001;
+    transform: translateX(-100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+}}
+
+.toc-drawer.visible {{
+    transform: translateX(0);
+}}
+
+.toc-header {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #16213e;
+    border-bottom: 2px solid var(--primary-color);
+    flex-shrink: 0;
+}}
+
+.toc-header h2 {{
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}}
+
+.toc-close-btn {{
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 1.6rem;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    line-height: 1;
+}}
+
+.toc-close-btn:hover {{
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}}
+
+.toc-search {{
+    padding: 12px 16px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}}
+
+.toc-search input {{
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+}}
+
+.toc-search input::placeholder {{
+    color: #777;
+}}
+
+.toc-search input:focus {{
+    border-color: var(--primary-color);
+}}
+
+.toc-list {{
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+}}
+
+.toc-list::-webkit-scrollbar {{
+    width: 6px;
+}}
+
+.toc-list::-webkit-scrollbar-track {{
+    background: transparent;
+}}
+
+.toc-list::-webkit-scrollbar-thumb {{
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}}
+
+.toc-item {{
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}}
+
+.toc-item:hover {{
+    background: rgba(255, 255, 255, 0.06);
+    border-left-color: var(--primary-color);
+}}
+
+.toc-item.active {{
+    background: rgba(33, 150, 243, 0.15);
+    border-left-color: var(--primary-color);
+    color: white;
+}}
+
+.toc-item.hidden {{
+    display: none;
+}}
+
+.toc-item-title {{
+    flex: 1;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    word-break: break-word;
+}}
+
+.toc-item-page {{
+    font-size: 0.75rem;
+    color: #888;
+    flex-shrink: 0;
+    padding-top: 2px;
+}}
+
+.toc-item.active .toc-item-page {{
+    color: var(--primary-color);
+}}
+
+/* TOC level indentation */
+.toc-item[data-level="1"] {{
+    padding-left: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}}
+
+.toc-item[data-level="2"] {{
+    padding-left: 32px;
+    font-weight: 600;
+}}
+
+.toc-item[data-level="3"] {{
+    padding-left: 44px;
+    font-weight: 400;
+    color: #bbb;
+}}
+
+.toc-item[data-level="4"] {{
+    padding-left: 56px;
+    font-weight: 400;
+    color: #999;
+    font-size: 0.8rem;
+}}
+
+.toc-no-results {{
+    padding: 20px;
+    text-align: center;
+    color: #777;
+    font-size: 0.85rem;
 }}
 
 /* Zoom Controls */

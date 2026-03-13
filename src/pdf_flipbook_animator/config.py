@@ -17,7 +17,7 @@ class Config:
     lossless_webp: bool = True  # Use lossless WebP (essential for text quality)
     
     # Link preservation settings
-    preserve_links: bool = False  # Extract and render clickable PDF links
+    preserve_links: bool = False  # Extract and render clickable PDF links (internal and external)
     link_hover_color: str = "rgba(33, 150, 243, 0.2)"  # Highlight color on hover
     link_cursor: str = "pointer"  # CSS cursor style for links
 
@@ -29,6 +29,7 @@ class Config:
     show_page_numbers: bool = True
     enable_index_button: bool = True  # Show jump-to-index button
     index_page: int = 2  # Page number for index button (1-based)
+    enable_toc: bool = False  # Extract and show Table of Contents sidebar
 
     # Performance settings
     lazy_load: bool = True

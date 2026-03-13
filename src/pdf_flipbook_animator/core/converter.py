@@ -142,7 +142,7 @@ class PDFConverter:
         return metadata
 
     def extract_links(self, pdf_path: Path) -> Dict[int, List[Dict[str, any]]]:
-        """Extract internal page links from PDF.
+        """Extract internal page links and external URL links from PDF.
         
         Args:
             pdf_path: Path to input PDF file
@@ -154,12 +154,12 @@ class PDFConverter:
                     {
                         'type': 'internal',
                         'target_page': 5,
-                        'rect': {
-                            'x': 10.5,      # percentage
-                            'y': 20.3,      # percentage
-                            'width': 15.2,  # percentage
-                            'height': 2.8   # percentage
-                        }
+                        'rect': {...}
+                    },
+                    {
+                        'type': 'external',
+                        'url': 'https://example.com',
+                        'rect': {...}
                     }
                 ]
             }
@@ -177,6 +177,7 @@ class PDFConverter:
         links_data = {}
         total_links = 0
         internal_links = 0
+        external_links = 0
         
         for page_num in range(doc.page_count):
             page = doc[page_num]
@@ -188,8 +189,10 @@ class PDFConverter:
             extracted_links = []
             
             for link in page_links:
-                # Only process internal page navigation links
-                if link.get('kind') == fitz.LINK_GOTO:
+                link_kind = link.get('kind')
+                
+                # Process internal page navigation links
+                if link_kind == fitz.LINK_GOTO:
                     total_links += 1
                     internal_links += 1
                     
@@ -215,6 +218,34 @@ class PDFConverter:
                     }
                     
                     extracted_links.append(link_data)
+                
+                # Process external URL links
+                elif link_kind == fitz.LINK_URI:
+                    total_links += 1
+                    external_links += 1
+                    
+                    url = link.get('uri', '')
+                    if not url:
+                        continue  # Skip empty URLs
+                    
+                    # Get link rectangle
+                    link_rect = link['from']
+                    
+                    # Convert to percentages for responsive positioning
+                    rect_data = {
+                        'x': (link_rect.x0 / page.rect.width) * 100,
+                        'y': (link_rect.y0 / page.rect.height) * 100,
+                        'width': ((link_rect.x1 - link_rect.x0) / page.rect.width) * 100,
+                        'height': ((link_rect.y1 - link_rect.y0) / page.rect.height) * 100,
+                    }
+                    
+                    link_data = {
+                        'type': 'external',
+                        'url': url,
+                        'rect': rect_data,
+                    }
+                    
+                    extracted_links.append(link_data)
             
             if extracted_links:
                 links_data[page_num + 1] = extracted_links  # Store with 1-based page number
@@ -222,11 +253,59 @@ class PDFConverter:
         doc.close()
         
         logger.info(
-            f"Link extraction complete: {internal_links} internal links found "
-            f"on {len(links_data)} pages"
+            f"Link extraction complete: {internal_links} internal links, "
+            f"{external_links} external links found on {len(links_data)} pages"
         )
         
         return links_data
+
+    def extract_toc(self, pdf_path: Path) -> List[Dict[str, any]]:
+        """Extract table of contents / bookmarks from PDF.
+        
+        Uses PyMuPDF's get_toc() to extract the PDF bookmark tree.
+        
+        Args:
+            pdf_path: Path to input PDF file
+            
+        Returns:
+            List of TOC entries, each a dict with:
+            {
+                'level': int,      # Nesting level (1 = top-level)
+                'title': str,      # Chapter/section title
+                'page': int        # Target page number (1-based)
+            }
+        """
+        if not pdf_path.exists():
+            raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+        
+        logger.info(f"Extracting TOC from: {pdf_path}")
+        
+        try:
+            doc = fitz.open(pdf_path)
+        except Exception as e:
+            raise ValueError(f"Failed to open PDF: {e}")
+        
+        toc_raw = doc.get_toc()
+        doc.close()
+        
+        if not toc_raw:
+            logger.info("No TOC/bookmarks found in PDF")
+            return []
+        
+        toc_data = []
+        for entry in toc_raw:
+            level, title, page = entry[0], entry[1], entry[2]
+            title = title.strip()
+            if not title or page < 1:
+                continue
+            toc_data.append({
+                'level': level,
+                'title': title,
+                'page': page,
+            })
+        
+        logger.info(f"TOC extraction complete: {len(toc_data)} entries")
+        return toc_data
 
     def get_pdf_info(self, pdf_path: Path) -> Dict[str, any]:
         """Get basic information about a PDF file.

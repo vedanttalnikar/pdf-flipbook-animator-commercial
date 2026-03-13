@@ -134,7 +134,12 @@ def cli(verbose: bool, quiet: bool):
 @click.option(
     "--preserve-links",
     is_flag=True,
-    help="Preserve clickable PDF links for navigation (e.g., table of contents)",
+    help="Preserve clickable PDF links (internal navigation and external URLs)",
+)
+@click.option(
+    "--enable-toc",
+    is_flag=True,
+    help="Extract PDF bookmarks and show a Table of Contents sidebar",
 )
 def convert(
     pdf_path: Path,
@@ -153,6 +158,7 @@ def convert(
     index_page: int,
     no_index_button: bool,
     preserve_links: bool,
+    enable_toc: bool,
 ):
     """Convert a PDF to an animated flipbook.
 
@@ -194,6 +200,7 @@ def convert(
             enable_index_button=not no_index_button,
             index_page=index_page,
             preserve_links=preserve_links,
+            enable_toc=enable_toc,
         )
 
         click.echo(f"\n📄 Converting PDF: {click.style(pdf_path.name, fg='cyan', bold=True)}")
@@ -222,7 +229,19 @@ def convert(
                     f"on {len(links_data)} pages\n"
                 )
             else:
-                click.echo("ℹ️  No internal links found in PDF\n")
+                click.echo("ℹ️  No links found in PDF\n")
+
+        # Extract TOC if enabled
+        toc_data = None
+        if enable_toc:
+            click.echo("📋 Extracting Table of Contents...")
+            toc_data = converter.extract_toc(pdf_path)
+            if toc_data:
+                click.echo(
+                    f"✅ Found {click.style(str(len(toc_data)), fg='green', bold=True)} TOC entries\n"
+                )
+            else:
+                click.echo("ℹ️  No bookmarks/TOC found in PDF\n")
 
         # Step 2: Generate HTML flipbook
         click.echo("🔄 Step 2/2: Generating flipbook viewer...")
@@ -233,6 +252,7 @@ def convert(
             metadata,
             title,
             links_data=links_data,
+            toc_data=toc_data,
         )
 
         click.echo(f"✅ Generated HTML viewer\n")
