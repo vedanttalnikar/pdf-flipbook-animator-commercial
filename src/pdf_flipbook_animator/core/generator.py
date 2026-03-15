@@ -888,10 +888,11 @@ body {{
         width: 100%;
         height: auto;
         flex-direction: row;
-        padding: 10px 15px;
+        padding: 6px 10px;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
-        gap: 15px;
+        gap: 8px;
+        align-items: center;
     }}
     
     /* Right panel becomes FOOTER at bottom */
@@ -900,11 +901,12 @@ body {{
         width: 100%;
         height: auto;
         flex-direction: row;
-        padding: 10px 15px;
+        flex-wrap: wrap;
+        padding: 6px 10px;
         border-left: none;
         border-top: 1px solid var(--border-color);
-        gap: 15px;
-        justify-content: space-between;
+        gap: 6px;
+        justify-content: center;
         align-items: center;
     }}
     
@@ -912,7 +914,7 @@ body {{
     .side-nav-btn {{
         flex-direction: row;
         min-height: auto;
-        padding: 10px 20px;
+        padding: 8px 14px;
         gap: 8px;
         width: auto;
         flex: 0 0 auto;
@@ -927,26 +929,20 @@ body {{
         font-size: 0.85rem;
     }}
     
-    /* Panel header becomes horizontal */
+    /* Hide title on mobile to save space */
+    .panel-header .title {{
+        display: none;
+    }}
+    
+    /* Panel header becomes a compact button row */
     .panel-header {{
         flex-direction: row;
         border-bottom: none;
-        border-right: 1px solid var(--border-color);
-        padding: 0 15px 0 0;
+        border-right: none;
+        padding: 0;
         margin: 0;
-        gap: 10px;
-        flex: 1;
-        min-width: 0;
-    }}
-    
-    .panel-header .title {{
-        font-size: 0.9rem;
-        text-align: left;
-        writing-mode: horizontal-tb;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        flex: 1;
+        gap: 6px;
+        flex: 0 0 auto;
         min-width: 0;
     }}
     
@@ -957,6 +953,27 @@ body {{
         padding: 6px;
     }}
     
+    /* Compact zoom controls inline */
+    .zoom-controls {{
+        margin-top: 0;
+        padding: 4px 6px;
+        gap: 4px;
+        flex: 0 0 auto;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+    }}
+    
+    .zoom-btn {{
+        padding: 4px 8px;
+        font-size: 14px;
+        min-width: 28px;
+    }}
+    
+    .zoom-level {{
+        font-size: 11px;
+        min-width: 36px;
+    }}
+    
     /* Page info horizontal */
     .page-info {{
         padding: 0;
@@ -964,15 +981,16 @@ body {{
     }}
     
     .page-indicator {{
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         writing-mode: horizontal-tb;
     }}
     
-    /* Progress bar in footer */
+    /* Progress bar spans full width at bottom of footer */
     .progress-container {{
         padding: 0;
-        flex: 1;
-        max-width: 200px;
+        flex: 1 1 100%;
+        max-width: 100%;
+        order: 10;
     }}
     
     .help-text {{
@@ -1038,12 +1056,12 @@ body {{
 @media (max-width: 480px) {{
     .left-panel,
     .right-panel {{
-        padding: 8px 10px;
-        gap: 10px;
+        padding: 5px 8px;
+        gap: 5px;
     }}
     
     .side-nav-btn {{
-        padding: 8px 15px;
+        padding: 6px 10px;
         font-size: 0.75rem;
     }}
     
@@ -1055,16 +1073,35 @@ body {{
         font-size: 0.75rem;
     }}
     
-    .panel-header .title {{
-        font-size: 0.8rem;
+    .icon-btn {{
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+        padding: 4px;
+    }}
+    
+    .zoom-controls {{
+        padding: 3px 4px;
+        gap: 3px;
+    }}
+    
+    .zoom-btn {{
+        padding: 3px 6px;
+        font-size: 12px;
+        min-width: 24px;
+    }}
+    
+    .zoom-level {{
+        font-size: 10px;
+        min-width: 30px;
     }}
     
     .page-indicator {{
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }}
     
     .progress-container {{
-        max-width: 120px;
+        max-width: 100%;
     }}
 }}
 
