@@ -126,6 +126,8 @@ class TocDrawer {
     renderToc() {
         this.tocList.innerHTML = '';
         this.items = [];
+        this.h1Groups = [];
+        let currentH1 = null;
 
         this.tocData.forEach((entry, index) => {
             const li = document.createElement('li');
@@ -133,6 +135,24 @@ class TocDrawer {
             li.dataset.level = entry.level;
             li.dataset.page = entry.page;
             li.dataset.index = index;
+
+            if (entry.level === 1) {
+                const toggle = document.createElement('span');
+                toggle.className = 'toc-toggle';
+                toggle.textContent = '▼';
+                li.appendChild(toggle);
+                li.classList.add('collapsed');
+                currentH1 = { element: li, children: [] };
+                this.h1Groups.push(currentH1);
+                const grp = currentH1;
+                toggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleH1(grp);
+                });
+            } else if (currentH1) {
+                currentH1.children.push(li);
+                li.classList.add('toc-child-hidden');
+            }
 
             const titleSpan = document.createElement('span');
             titleSpan.className = 'toc-item-title';
@@ -156,6 +176,31 @@ class TocDrawer {
         });
     }
 
+    toggleH1(group) {
+        const isCollapsed = group.element.classList.contains('collapsed');
+        if (isCollapsed) {
+            group.element.classList.remove('collapsed');
+            group.children.forEach(c => c.classList.remove('toc-child-hidden'));
+        } else {
+            group.element.classList.add('collapsed');
+            group.children.forEach(c => c.classList.add('toc-child-hidden'));
+        }
+    }
+
+    expandAllGroups() {
+        this.h1Groups.forEach(g => {
+            g.element.classList.remove('collapsed');
+            g.children.forEach(c => c.classList.remove('toc-child-hidden'));
+        });
+    }
+
+    collapseAllGroups() {
+        this.h1Groups.forEach(g => {
+            g.element.classList.add('collapsed');
+            g.children.forEach(c => c.classList.add('toc-child-hidden'));
+        });
+    }
+
     setupEvents() {
         const tocBtn = document.getElementById('toc-btn');
         if (tocBtn) tocBtn.addEventListener('click', () => this.toggle());
@@ -176,14 +221,21 @@ class TocDrawer {
         const query = this.searchInput.value.trim().toLowerCase();
         let visibleCount = 0;
 
-        this.items.forEach(({ element, entry }) => {
-            if (!query || entry.title.toLowerCase().includes(query) || String(entry.page).includes(query)) {
-                element.classList.remove('hidden');
-                visibleCount++;
-            } else {
-                element.classList.add('hidden');
-            }
-        });
+        if (query) {
+            this.expandAllGroups();
+            this.items.forEach(({ element, entry }) => {
+                if (entry.title.toLowerCase().includes(query) || String(entry.page).includes(query)) {
+                    element.classList.remove('hidden', 'toc-child-hidden');
+                    visibleCount++;
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+        } else {
+            this.items.forEach(({ element }) => element.classList.remove('hidden'));
+            this.collapseAllGroups();
+            visibleCount = this.items.length;
+        }
 
         const existing = this.tocList.querySelector('.toc-no-results');
         if (visibleCount === 0 && query) {
@@ -211,6 +263,16 @@ class TocDrawer {
 
         if (activeEntry) {
             activeEntry.element.classList.add('active');
+            if (activeEntry.entry.level > 1) {
+                for (const group of this.h1Groups) {
+                    if (group.children.includes(activeEntry.element)) {
+                        if (group.element.classList.contains('collapsed')) {
+                            this.toggleH1(group);
+                        }
+                        break;
+                    }
+                }
+            }
             if (this.isOpen) {
                 activeEntry.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }

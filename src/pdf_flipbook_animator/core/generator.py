@@ -176,7 +176,7 @@ class FlipbookGenerator:
         <aside class="right-panel">
             <div class="panel-header">
                 <h1 class="title">{title}</h1>
-                {'<button id="toc-btn" class="icon-btn" title="Table of Contents">📋</button>' if toc_data else ''}
+                {'<button id="toc-btn" class="icon-btn toc-btn-label" title="Table of Contents">📋 Index</button>' if toc_data else ''}
                 {'<button id="index-btn" class="icon-btn" title="Jump to Index (Page ' + str(self.config.index_page) + ')" data-index-page="' + str(self.config.index_page) + '">📑</button>' if self.config.enable_index_button and page_count >= self.config.index_page else ''}
                 {'<button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen (F)">⛶</button>' if self.config.enable_fullscreen else ''}
             </div>
@@ -216,11 +216,11 @@ class FlipbookGenerator:
                 <p>🖱️ Press F for fullscreen</p>
             </div>
         </aside>
-    </div>
 
-    <!-- TOC Drawer -->
-    {'<div id="toc-backdrop" class="toc-backdrop"></div>' if toc_data else ''}
-    {'<div id="toc-drawer" class="toc-drawer"><div class="toc-header"><h2>📋 Table of Contents</h2><button id="toc-close-btn" class="toc-close-btn">&times;</button></div><div class="toc-search"><input type="text" id="toc-search-input" placeholder="Search chapters..." autocomplete="off"></div><ul id="toc-list" class="toc-list"></ul></div>' if toc_data else ''}
+        <!-- TOC Drawer (inside container for fullscreen support) -->
+        {'<div id="toc-backdrop" class="toc-backdrop"></div>' if toc_data else ''}
+        {'<div id="toc-drawer" class="toc-drawer"><div class="toc-header"><h2>📋 Table of Contents</h2><button id="toc-close-btn" class="toc-close-btn">&times;</button></div><div class="toc-search"><input type="text" id="toc-search-input" placeholder="Search chapters..." autocomplete="off"></div><ul id="toc-list" class="toc-list"></ul></div>' if toc_data else ''}
+    </div>
 
     <!-- Load links data if available -->
     <script>
@@ -380,6 +380,14 @@ body {{
 .icon-btn:hover {{
     background: color-mix(in srgb, var(--primary-color) 85%, black);
     transform: scale(1.05);
+}}
+
+.toc-btn-label {{
+    width: auto;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    gap: 4px;
+    white-space: nowrap;
 }}
 
 /* Main Content - Full Height */
@@ -666,27 +674,62 @@ body {{
 
 /* TOC level indentation */
 .toc-item[data-level="1"] {{
-    padding-left: 20px;
+    padding: 12px 20px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.15), rgba(33, 150, 243, 0.05));
+    border-left: 4px solid var(--primary-color);
+    margin-top: 6px;
+    color: #fff;
+}}
+
+.toc-item[data-level="1"]:hover {{
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.25), rgba(33, 150, 243, 0.1));
+}}
+
+.toc-toggle {{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    font-size: 0.65rem;
+    margin-right: 6px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    color: var(--primary-color);
+    cursor: pointer;
+    border-radius: 3px;
+}}
+
+.toc-toggle:hover {{
+    background: rgba(255,255,255,0.1);
+}}
+
+.toc-item.collapsed .toc-toggle {{
+    transform: rotate(-90deg);
 }}
 
 .toc-item[data-level="2"] {{
-    padding-left: 32px;
+    padding-left: 40px;
     font-weight: 600;
 }}
 
 .toc-item[data-level="3"] {{
-    padding-left: 44px;
+    padding-left: 52px;
     font-weight: 400;
     color: #bbb;
 }}
 
 .toc-item[data-level="4"] {{
-    padding-left: 56px;
+    padding-left: 64px;
     font-weight: 400;
     color: #999;
     font-size: 0.8rem;
+}}
+
+.toc-child-hidden {{
+    display: none !important;
 }}
 
 .toc-no-results {{
@@ -953,6 +996,13 @@ body {{
         padding: 6px;
     }}
     
+    .toc-btn-label {{
+        width: auto;
+        padding: 6px 8px;
+        font-size: 0.75rem;
+        height: 36px;
+    }}
+    
     /* Compact zoom controls inline */
     .zoom-controls {{
         margin-top: 0;
@@ -1078,6 +1128,13 @@ body {{
         height: 32px;
         font-size: 0.9rem;
         padding: 4px;
+    }}
+    
+    .toc-btn-label {{
+        width: auto;
+        padding: 4px 6px;
+        font-size: 0.7rem;
+        height: 32px;
     }}
     
     .zoom-controls {{
