@@ -1787,7 +1787,7 @@
         <aside class="right-panel">
             <div class="panel-header">
                 <h1 class="title">स्मर्तृगामी पत्रभेट सद्गुरुदास महाराज स्मरण विशेषांक</h1>
-                <button id="toc-btn" class="icon-btn" title="Table of Contents">📋</button>
+                <button id="toc-btn" class="icon-btn toc-btn-label" title="Table of Contents">📋 Index</button>
                 <button id="index-btn" class="icon-btn" title="Jump to Index (Page 18)" data-index-page="18">📑</button>
                 <button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen (F)">⛶</button>
             </div>
@@ -1827,11 +1827,11 @@
                 <p>🖱️ Press F for fullscreen</p>
             </div>
         </aside>
-    </div>
 
-    <!-- TOC Drawer -->
-    <div id="toc-backdrop" class="toc-backdrop"></div>
-    <div id="toc-drawer" class="toc-drawer"><div class="toc-header"><h2>📋 Table of Contents</h2><button id="toc-close-btn" class="toc-close-btn">&times;</button></div><div class="toc-search"><input type="text" id="toc-search-input" placeholder="Search chapters..." autocomplete="off"></div><ul id="toc-list" class="toc-list"></ul></div>
+        <!-- TOC Drawer (inside container for fullscreen support) -->
+        <div id="toc-backdrop" class="toc-backdrop"></div>
+        <div id="toc-drawer" class="toc-drawer"><div class="toc-header"><h2>📋 Table of Contents</h2><button id="toc-close-btn" class="toc-close-btn">&times;</button></div><div class="toc-search"><input type="text" id="toc-search-input" placeholder="Search chapters..." autocomplete="off"></div><ul id="toc-list" class="toc-list"></ul></div>
+    </div>
 
     <!-- Load links data if available -->
     <script>
