@@ -48,6 +48,15 @@ pdf-flipbook convert examples/January_2026_patrabhet.pdf \
     --title "Sample Magazine"
 ```
 
+### Realistic Mode with Links & TOC
+```bash
+pdf-flipbook convert examples/January_2026_patrabhet.pdf \
+    --animation-mode realistic \
+    --dpi 300 \
+    --preserve-links \
+    --enable-toc
+```
+
 ## View Examples
 
 After conversion, open the generated flipbooks:

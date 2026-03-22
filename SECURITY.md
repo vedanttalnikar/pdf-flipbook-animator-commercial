@@ -6,6 +6,7 @@ We release patches for security vulnerabilities for the following versions:
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 0.2.x   | :white_check_mark: |
 | 0.1.x   | :white_check_mark: |
 
 ## Reporting a Vulnerability
@@ -86,6 +87,7 @@ When hosting generated flipbooks:
 - Generated HTML/CSS/JS contains no server-side code
 - JavaScript is minimal and doesn't collect user data
 - No external resources loaded except documented CDN libraries
+- **External Links (`--preserve-links`)**: When using the `--preserve-links` flag, clickable links from the original PDF are preserved. External URLs (LINK_URI) will open in a new tab. Review the source PDF to ensure linked URLs are trusted before enabling this feature.
 
 ### Privacy
 
@@ -111,8 +113,9 @@ We use:
 
 ## Contact
 
-For security concerns, please contact the maintainers via:
+For security concerns, please contact:
+- Email: vedanttalnikar@gmail.com
 - GitHub Issues (for non-security bugs)
-- Email: [create a private security advisory on GitHub]
+- [Create a private security advisory on GitHub](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/security/advisories/new)
 
 Thank you for helping keep PDF Flipbook Animator secure!

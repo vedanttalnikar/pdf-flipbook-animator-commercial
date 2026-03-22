@@ -1,4 +1,4 @@
-# Deployment Summary - v0.2.0
+﻿# Deployment Summary - v0.2.0
 
 **Date:** March 5, 2026  
 **Status:** ✅ Successfully Deployed
@@ -230,7 +230,7 @@ GitHub Pages typically updates within **2-3 minutes** after pushing to `gh-pages
 
 For any issues or questions:
 - **GitHub Issues:** https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues
-- **Email:** support@pdf-flipbook-animator.com
+- **Email:** vedanttalnikar@gmail.com
 - **Documentation:** [README.md](README.md)
 
 ---

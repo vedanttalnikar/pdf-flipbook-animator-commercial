@@ -1,4 +1,4 @@
-# Getting Started with Development
+﻿# Getting Started with Development
 
 Welcome to PDF Flipbook Animator development!
 
@@ -26,7 +26,7 @@ pre-commit install
 # Check CLI is available
 pdf-flipbook --version
 
-# Should output: pdf-flipbook, version 0.1.0
+# Should output: pdf-flipbook, version 0.2.0
 ```
 
 ### 3. Test with Sample PDF
@@ -151,8 +151,9 @@ pdf_flipbook_animator/
 
 ## Need Help?
 
-- 📖 [Full Documentation](https://yourusername.github.io/pdf-flipbook-animator)
-- 💬 [GitHub Discussions](https://github.com/yourusername/pdf-flipbook-animator/discussions)
-- 🐛 [Issue Tracker](https://github.com/yourusername/pdf-flipbook-animator/issues)
+- � Email: vedanttalnikar@gmail.com
+- �📖 [Full Documentation](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial)
+- 💬 [GitHub Discussions](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/discussions)
+- 🐛 [Issue Tracker](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
 
 Happy coding! 🚀

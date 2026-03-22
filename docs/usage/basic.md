@@ -125,6 +125,51 @@ Remove the fullscreen button:
 pdf-flipbook convert doc.pdf --no-fullscreen
 ```
 
+## Animation Modes
+
+Choose from three animation styles:
+
+```bash
+# Simple transitions (default, fast)
+pdf-flipbook convert doc.pdf --animation-mode simple
+
+# 3D CSS page fold effect
+pdf-flipbook convert doc.pdf --animation-mode 3d-css
+
+# Realistic page curl with physics (recommended)
+pdf-flipbook convert doc.pdf --animation-mode realistic
+
+# Custom animation speed
+pdf-flipbook convert doc.pdf -a realistic --flip-duration 1000
+```
+
+## PDF Content Options
+
+### Preserve Clickable Links
+
+Keep internal page links and external URLs from the original PDF:
+
+```bash
+pdf-flipbook convert doc.pdf --preserve-links
+```
+
+### Table of Contents
+
+Extract PDF bookmarks into a searchable sidebar with collapsible H1 groups:
+
+```bash
+pdf-flipbook convert doc.pdf --enable-toc
+```
+
+### Index Button
+
+Configure the jump-to-index button target page:
+
+```bash
+pdf-flipbook convert doc.pdf --index-page 5
+pdf-flipbook convert doc.pdf --no-index-button
+```
+
 ## Combined Example
 
 Putting it all together:
@@ -132,11 +177,13 @@ Putting it all together:
 ```bash
 pdf-flipbook convert annual-report.pdf \
     --output-dir ./website/reports/2024 \
-    --dpi 180 \
+    --dpi 250 \
     --quality 90 \
     --title "Annual Report 2024" \
     --primary-color "#1976D2" \
-    --single-page
+    --animation-mode realistic \
+    --preserve-links \
+    --enable-toc
 ```
 
 ## Info Command
@@ -171,6 +218,8 @@ Each conversion creates this structure:
 ```
 output/document-name/
 ├── index.html              # Main viewer
+├── links_data.json         # Link data (if --preserve-links)
+├── toc_data.json           # TOC data (if --enable-toc)
 ├── css/
 │   └── style.css          # Styling
 ├── js/

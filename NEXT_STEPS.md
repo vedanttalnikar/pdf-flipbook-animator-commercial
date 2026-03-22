@@ -15,7 +15,7 @@ git commit -m "Initial commit: Complete PDF Flipbook Animator implementation"
 3. Add team members as collaborators if needed
 4. Push to GitHub:
 ```powershell
-git remote add origin https://github.com/YOUR-USERNAME/pdf-flipbook-animator-commercial.git
+git remote add origin https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial.git
 git branch -M main
 git push -u origin main
 ```
@@ -66,29 +66,41 @@ Visit: http://127.0.0.1:8000
 
 ## Feature Roadmap
 
-### Priority 1: Realistic Animation Feature (v0.2.0 - April 2026)
-**Status: In Development**
-- Add 3 animation modes: simple, 3d-css, realistic
-- Integrate StPageFlip library for realistic page curl effect
-- Add configuration options for animation customization
+### Priority 1: Realistic Animation Feature (v0.2.0)
+**Status: ✅ Complete**
+- ✅ 3 animation modes: simple, 3d-css, realistic
+- ✅ StPageFlip library integration for realistic page curl
+- ✅ Configuration options for animation customization
 - See `FEATURE_REALISTIC_ANIMATION.md` for detailed specification
-- **Estimated Effort**: 4-5 days
-- **Target Release**: v0.2.0 (April 2026)
 
 ### Future Enhancements
 
-#### v0.2.0 (April 2026) - Animation Enhancements
+#### v0.2.0 (April 2026) - Animation Enhancements ✅
 - ✅ Realistic 3D page flip animation
+- ✅ Configurable flip speed and easing
+- ✅ Touch gesture support for mobile
+- ✅ HTML mode for perfect text quality
+- ✅ Device pixel ratio support for Retina/4K
+- ✅ Lossless WebP compression
+- ✅ Jump-to-index button
+- ✅ Windows executable release
 - Page flip sound effects
-- Configurable flip speed and easing
-- Touch gesture support for mobile
 
-#### v0.3.0 (May 2026) - Navigation Enhancements
+#### v0.2.x (March 2026) - Links, TOC, Zoom ✅
+- ✅ Clickable PDF links (`--preserve-links`) - internal navigation and external URLs
+- ✅ Table of Contents sidebar (`--enable-toc`) - extracted from PDF bookmarks
+- ✅ TOC search functionality with real-time filtering
+- ✅ Collapsible TOC hierarchy with H1 grouping and expand/collapse
+- ✅ TOC "Index" label with responsive sizing
+- ✅ Scroll-wheel zoom with click-and-drag panning
+- ✅ Context-aware cursor states (grab, zoom-in, zoom-out, pointer)
+- ✅ Page jump/goto functionality
+- ✅ Mobile-optimized toolbar and layout fixes
+- ✅ Fullscreen mode bug fixes (duplicate handlers, stacking context)
+
+#### v0.3.0 (Future) - Navigation Enhancements
 - Thumbnail navigation sidebar
-- Search functionality within flipbook
-- Table of contents generation from PDF bookmarks
-- Page jump/goto functionality
-- Zoom controls
+- Page flip sound effects
 
 #### v0.4.0 (June 2026) - Customization
 - Multiple theme presets (dark, light, sepia)
@@ -140,4 +152,9 @@ Visit: http://127.0.0.1:8000
 - ✅ **Step 3 Completed**: Pushed to private GitHub repository (https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial)
 - ✅ **Realistic Animation Feature**: v0.2.0 complete with 3 animation modes (simple, 3d-css, realistic)
 - ✅ **Mobile Support**: Touch/swipe gestures, comprehensive device testing, mobile-optimized
+- ✅ **Clickable Links**: `--preserve-links` flag for internal navigation (LINK_GOTO) and external URLs (LINK_URI)
+- ✅ **Table of Contents**: `--enable-toc` flag with searchable sidebar, collapsible H1 hierarchy, active highlighting
+- ✅ **Zoom & Pan**: Scroll-wheel zoom with click-and-drag panning, context-aware cursors
+- ✅ **Fullscreen Fixes**: Duplicate handler cleanup, stacking context fixes, mobile layout
 - ✅ **Documentation**: Complete API reference, mobile testing guide, commercial setup guide
+- ✅ **GitHub Pages Demo**: Live at https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/

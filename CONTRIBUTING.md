@@ -1,4 +1,4 @@
-# Contributing to PDF Flipbook Animator
+﻿# Contributing to PDF Flipbook Animator
 
 Thank you for your interest in contributing to PDF Flipbook Animator! We welcome contributions from the community.
 
@@ -217,7 +217,7 @@ def test_convert_pdf_to_images(sample_pdf, tmp_path):
 
 1. **Update your fork**:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/pdf-flipbook-animator.git
+   git remote add upstream https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial.git
    git fetch upstream
    git merge upstream/main
    ```
@@ -281,8 +281,8 @@ For maintainers only:
 
 ## Questions?
 
-- Open a [Discussion](https://github.com/yourusername/pdf-flipbook-animator/discussions)
-- Check the [Documentation](https://yourusername.github.io/pdf-flipbook-animator)
+- Open a [Discussion](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/discussions)
+- Check the [Documentation](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial)
 - Contact maintainers via GitHub issues
 
 Thank you for contributing! 🎉

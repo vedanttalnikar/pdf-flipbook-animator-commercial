@@ -63,6 +63,14 @@ pdf-flipbook convert <PDF_PATH> [OPTIONS]
 | `--flip-duration` | 200-2000 ms | 800 | Page turn animation speed |
 | `--enable-curl` | Flag | Off | 3D page curl effect (realistic mode only) |
 
+#### PDF Content Options
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--preserve-links` | Flag | Off | Preserve clickable PDF links (internal page navigation and external URLs) |
+| `--enable-toc` | Flag | Off | Extract PDF bookmarks into a searchable Table of Contents sidebar |
+| `--index-page` | 1-9999 | 2 | Page number for jump-to-index button |
+| `--no-index-button` | Flag | Off | Disable jump-to-index button |
+
 #### System Options
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -87,6 +95,15 @@ pdf-flipbook convert book.pdf --title "My Digital Magazine" \
 
 # Print-quality (large file size, best visuals)
 pdf-flipbook convert book.pdf --dpi 300 --quality 95 -a realistic
+
+# Preserve clickable links from PDF
+pdf-flipbook convert book.pdf -a realistic --preserve-links
+
+# Enable Table of Contents sidebar (requires PDF bookmarks)
+pdf-flipbook convert book.pdf -a realistic --enable-toc
+
+# Full-featured conversion (recommended)
+pdf-flipbook convert book.pdf -a realistic --dpi 300 --preserve-links --enable-toc
 
 # Fast generation (quick preview)
 pdf-flipbook convert book.pdf --dpi 72 --quality 70 -a simple

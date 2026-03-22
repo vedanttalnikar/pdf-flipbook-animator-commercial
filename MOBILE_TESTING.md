@@ -1,4 +1,4 @@
-# Mobile Device Testing Guide
+﻿# Mobile Device Testing Guide
 
 ## PDF Flipbook Animator - Mobile Compatibility Report
 
@@ -442,7 +442,7 @@ pdf-flipbook convert book.pdf --dpi 200 --animation-mode realistic
 ## 📞 Support
 
 For mobile-specific issues:
-- Email: mobile-support@pdf-flipbook-animator.com
+- Email: mobile-vedanttalnikar@gmail.com
 - Docs: https://docs.pdf-flipbook-animator.com/mobile
 - Report bugs: Include device model, OS version, browser
 

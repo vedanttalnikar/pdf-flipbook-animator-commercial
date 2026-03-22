@@ -1,4 +1,4 @@
-# Quick Start
+﻿# Quick Start
 
 Get started with PDF Flipbook Animator in under 5 minutes!
 
@@ -52,6 +52,8 @@ Use these controls in your flipbook:
 - **Page Up/Down**: Navigate pages
 - **Home/End**: First/Last page
 - **F**: Toggle fullscreen
+- **Scroll wheel**: Zoom in/out
+- **Click + Drag**: Pan when zoomed
 - **Click**: Page buttons or directly on pages
 - **Touch**: Swipe on mobile devices
 
@@ -81,16 +83,43 @@ pdf-flipbook convert book.pdf --output-dir ./my-website/flipbook
 pdf-flipbook convert book.pdf --primary-color "#FF5722"
 ```
 
+### Animation Modes
+
+```bash
+# Simple transitions (fast, default)
+pdf-flipbook convert book.pdf --animation-mode simple
+
+# 3D CSS page fold
+pdf-flipbook convert book.pdf --animation-mode 3d-css
+
+# Realistic page curl (recommended)
+pdf-flipbook convert book.pdf --animation-mode realistic
+```
+
+### Preserve Clickable Links
+
+```bash
+pdf-flipbook convert book.pdf --preserve-links
+```
+
+### Table of Contents
+
+```bash
+pdf-flipbook convert book.pdf --enable-toc
+```
+
 ## Example with All Options
 
 ```bash
 pdf-flipbook convert book.pdf \
     --output-dir ./my-flipbook \
-    --dpi 200 \
+    --dpi 250 \
     --quality 90 \
     --title "My Digital Magazine" \
     --primary-color "#9C27B0" \
-    --single-page
+    --animation-mode realistic \
+    --preserve-links \
+    --enable-toc
 ```
 
 ## Check PDF Information

@@ -31,7 +31,10 @@ Transform any PDF into an interactive, web-based flipbook with stunning page-tur
 
 - 📄 **PDF to Web** - Convert any PDF to an interactive flipbook
 - 🎬 **3 Animation Modes** - Simple, 3D CSS, or realistic page curl effects
-- 🚀 **Easy CLI** - Simple command-line interface
+- � **Clickable Links** - Preserves internal navigation and external hyperlinks (`--preserve-links`)
+- 📑 **Table of Contents** - Searchable TOC sidebar extracted from PDF bookmarks (`--enable-toc`)
+- 🔍 **Zoom & Pan** - Scroll-wheel zoom with click-and-drag panning
+- �🚀 **Easy CLI** - Simple command-line interface
 - 🎨 **Customizable** - Control colors, quality, and layout
 - 📱 **Responsive** - Works on all devices and screen sizes
 - ⚡ **Optimized** - WebP images with lazy loading
@@ -46,11 +49,12 @@ Transform any PDF into an interactive, web-based flipbook with stunning page-tur
 
 **[→ Try the Interactive Demo](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/)**
 
-Experience a real 52-page magazine flipbook with **Realistic Mode**:
+Experience a real 583-page Marathi book flipbook with **Realistic Mode**:
 - ✅ **Side panel layout** - Maximum vertical space for PDF viewing
-- ✅ **250 DPI resolution** - Crystal clear text and images
-- ✅ **Lossless WebP** - Zero compression artifacts
-- ✅ **HTML Mode** - No canvas downscaling, perfect quality
+- ✅ **300 DPI resolution** - Crystal clear text and images
+- ✅ **Clickable links** - Internal page navigation and external URLs preserved
+- ✅ **Table of Contents** - Searchable, collapsible TOC sidebar with H1 grouping
+- ✅ **Zoom & pan** - Scroll-wheel zoom with click-and-drag panning
 - ✅ **Fully responsive** - Auto-adapts to desktop/tablet/mobile
 - ✅ **Touch/swipe gestures** - Natural mobile interaction
 - ✅ **Keyboard navigation** - Arrow keys, Page Up/Down, Home/End
@@ -143,6 +147,15 @@ pdf-flipbook convert book.pdf --animation-mode realistic   # Realistic page curl
 # Custom animation timing
 pdf-flipbook convert book.pdf -a realistic --flip-duration 1000
 
+# Preserve clickable links from PDF
+pdf-flipbook convert book.pdf --preserve-links
+
+# Enable Table of Contents sidebar
+pdf-flipbook convert book.pdf --enable-toc
+
+# Full-featured conversion (recommended)
+pdf-flipbook convert book.pdf -a realistic --dpi 300 --preserve-links --enable-toc
+
 # Batch convert multiple PDFs
 pdf-flipbook batch ./pdf-folder/
 
@@ -176,6 +189,8 @@ pdf-flipbook convert INPUT.pdf [OPTIONS]
 | `--enable-curl` | Enable 3D page curl (realistic mode) | `False` |
 | `--index-page` | Jump-to-index button target page | `2` |
 | `--no-index-button` | Disable jump-to-index button | `False` |
+| `--preserve-links` | Preserve clickable PDF links (internal + external) | `False` |
+| `--enable-toc` | Extract PDF bookmarks for TOC sidebar | `False` |
 
 ### Batch Processing
 
@@ -459,14 +474,18 @@ ruff check src/ tests/
 mypy src/
 ```
 
-## 📊 Recent Improvements (v0.2.0+)
+## 📊 Recent Improvements
 
-- ✅ **v0.6.0** - HTML mode eliminates canvas downscaling bottleneck
-- ✅ **v0.5.0** - Fixed CSS image-rendering for crisp text
-- ✅ **v0.4.0** - Added lossless WebP support
-- ✅ **v0.3.1** - Added jump-to-index button feature
-- ✅ **v0.3.0** - Improved defaults (250 DPI, lossless enabled)
-- ✅ **v0.2.0** - Device pixel ratio support for Retina/4K displays
+- ✅ **Collapsible TOC** - H1 headings with expand/collapse, search-aware hierarchy
+- ✅ **Table of Contents** - `--enable-toc` extracts PDF bookmarks into a searchable sidebar
+- ✅ **Clickable Links** - `--preserve-links` preserves internal page links and external URLs
+- ✅ **Zoom & Pan** - Scroll-wheel zoom with click-and-drag panning, cursor states
+- ✅ **Mobile Layout** - Compact responsive toolbar, fullscreen fixes
+- ✅ **HTML Mode** - No canvas downscaling, perfect text quality
+- ✅ **Lossless WebP** - Zero compression artifacts
+- ✅ **Jump-to-Index** - Quick access button to table of contents page
+- ✅ **Device Pixel Ratio** - 2-3x sharper on Retina/4K displays
+- ✅ **Realistic Animation** - Physics-based page curl with StPageFlip
 
 ## 🤝 Contributing
 
@@ -499,6 +518,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📝 [Changelog](CHANGELOG.md) - Version history
 - 📥 [Windows Executable Releases](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/releases)
 
+**Contact:**
+- 📧 Email: vedanttalnikar@gmail.com
+
 **Community:**
 - 🐛 [Issue Tracker](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
 - 💬 [Discussions](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/discussions)
@@ -510,13 +532,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [x] Device pixel ratio support
 - [x] Jump-to-index button
 - [x] Windows executable release
+- [x] Clickable PDF links (internal navigation + external URLs)
+- [x] Table of Contents sidebar with search
+- [x] Collapsible TOC hierarchy with H1 grouping
+- [x] Zoom & pan with cursor states
+- [x] Mobile-optimized toolbar and layout
 - [ ] PDF.js integration for client-side rendering option
 - [ ] Thumbnail navigation sidebar
-- [ ] Search functionality
 - [ ] Annotation support
-- [ ] Table of contents generation
 - [ ] Custom themes/templates
-- [ ] Progress statistics
+- [ ] Page flip sound effects
+- [ ] Night/dark reading mode
 - [ ] Export to EPUB/other formats
 
 See the [open issues](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues) for a full list of proposed features and known issues.
@@ -528,7 +554,7 @@ If you find this project useful, please consider giving it a star!
 ---
 
 <p align="center">
-  Made with ❤️ by the PDF Flipbook Animator community
+  Made with ❤️ by <a href="mailto:vedanttalnikar@gmail.com">Vedant Talnikar</a>
 </p>
 
 <p align="center">

@@ -1,4 +1,4 @@
-# PDF Flipbook Animator
+﻿# PDF Flipbook Animator
 
 Convert PDFs to animated flipbook web pages with beautiful page-turning effects.
 
@@ -6,13 +6,18 @@ Convert PDFs to animated flipbook web pages with beautiful page-turning effects.
 
 ✨ **Easy to Use** - Simple CLI interface with sensible defaults  
 📄 **High Quality** - Converts PDFs to optimized WebP images  
+� **3 Animation Modes** - Simple, 3D CSS, or realistic page curl (StPageFlip)  
+🔗 **Clickable Links** - Preserves internal navigation and external URLs (`--preserve-links`)  
+📑 **Table of Contents** - Searchable, collapsible TOC sidebar from PDF bookmarks (`--enable-toc`)  
+🔍 **Zoom & Pan** - Scroll-wheel zoom with click-and-drag panning  
 🎨 **Customizable** - Control colors, DPI, quality, and more  
 📱 **Responsive** - Works beautifully on desktop, tablet, and mobile  
 ⚡ **Fast** - Lazy loading and efficient image optimization  
 🌐 **Host Anywhere** - Generates static HTML that works on any web server  
 🎯 **Keyboard Navigation** - Arrow keys, Page Up/Down, Home/End support  
 🖥️ **Fullscreen Mode** - Immersive reading experience  
-💾 **Position Memory** - Remembers where you left off
+💾 **Position Memory** - Remembers where you left off  
+💻 **Windows Executable** - No Python installation needed
 
 ## Quick Start
 
@@ -88,7 +93,7 @@ output/your-document/
 
 ## Demo
 
-[🔗 View Live Demo](https://yourusername.github.io/pdf-flipbook-animator/demo)
+[🔗 View Live Demo](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial/)
 
 !!! example "Try It Out"
     ```bash
@@ -131,7 +136,7 @@ output/your-document/
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/yourusername/pdf-flipbook-animator/blob/main/LICENSE)
+MIT License - see [LICENSE](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/blob/main/LICENSE)
 
 ## Contributing
 
@@ -139,9 +144,10 @@ Contributions are welcome! See [CONTRIBUTING.md](contributing.md) for guidelines
 
 ## Support
 
-- 📖 [Documentation](https://yourusername.github.io/pdf-flipbook-animator)
-- 🐛 [Issue Tracker](https://github.com/yourusername/pdf-flipbook-animator/issues)
-- 💬 [Discussions](https://github.com/yourusername/pdf-flipbook-animator/discussions)
+- � Email: vedanttalnikar@gmail.com
+- �📖 [Documentation](https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial)
+- 🐛 [Issue Tracker](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
+- 💬 [Discussions](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/discussions)
 
 ## Acknowledgments
 

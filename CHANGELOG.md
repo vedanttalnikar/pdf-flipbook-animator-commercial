@@ -22,6 +22,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mobile device testing suite and documentation**
 - **Interactive mobile device tester HTML page**
 - **Comprehensive mobile compatibility testing (MOBILE_TESTING.md)**
+- **`--preserve-links` flag** - Preserves clickable PDF links (internal navigation LINK_GOTO and external URLs LINK_URI)
+- **`--enable-toc` flag** - Extracts PDF bookmarks into a searchable Table of Contents sidebar
+- **Collapsible TOC hierarchy** - H1 headings visually distinct with expand/collapse toggle for child H2/H3/H4 entries
+- **TOC search** - Filter TOC entries with real-time search, auto-expand/collapse aware
+- **TOC "Index" label** - Button shows "📋 Index" text alongside icon with responsive sizing
+- **Active TOC highlighting** - Current page highlighted in sidebar, auto-expands parent H1 group
+- **Zoom & pan** - Scroll-wheel zoom with click-and-drag panning across all animation modes
+- **Cursor states** - Context-aware cursors (grab, zoom-in, zoom-out, pointer for links)
+- **HTML mode** - Uses DOM elements instead of canvas for perfect text quality
+- **Device pixel ratio support** - 2-3x sharper rendering on Retina/4K displays
+- **Lossless WebP** - Zero compression artifacts for text-heavy documents
+- **Jump-to-index button** - Quick access button with configurable target page
+- **Windows executable** - Standalone .exe via PyInstaller, no Python required
 
 ### Changed
 - Updated generator to support multiple JavaScript templates
@@ -31,17 +44,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enhanced 3D CSS mode with touch/swipe navigation**
 - **Optimized performance for mobile devices**
 - **Improved responsive CSS for tablets and phones**
+- **Default DPI increased to 250** for better clarity
+- **Lossless WebP enabled by default**
+- **Side panel layout** - Maximizes vertical space (~99vh for PDF viewing)
+- **Fully responsive breakpoints** - Desktop (≥1024px), Tablet (768-1023px), Mobile (<768px)
+- **Mobile toolbar** - Compact layout with proper spacing at all breakpoints
+- **Fullscreen mode** - Fixed duplicate event handlers on reinitialize, proper stacking context
 
-### Mobile Features
-- ✅ Swipe left/right to navigate pages
-- ✅ Tap on page to advance
-- ✅ Touch-friendly button sizes (44x44px WCAG compliant)
-- ✅ Passive event listeners for better scroll performance
-- ✅ Responsive breakpoints (768px, 480px)
-- ✅ Dark mode auto-detection
-- ✅ 60 FPS on modern mobile devices
-- ✅ Tested on iPhone, Android, and tablets
-- ✅ Lighthouse mobile score: 92+/100
+### Fixed
+- **Page skip bug** - nextPage/previousPage now uses flipNext()/flipPrev() for spread-aware navigation
+- **Fullscreen page skip** - Fixed duplicate event handlers on reinitialize
+- **Mobile layout overflow** - Rewrote mobile CSS for compact toolbar
+- **TOC mobile click** - Fixed click handler race condition on mobile
+- **goToPage fullscreen** - Fixed race condition in fullscreen goToPage
+- **TOC fullscreen stacking** - Fixed z-index stacking context in fullscreen mode
 
 ## [0.1.0] - 2026-03-04
 
@@ -59,5 +75,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete documentation
 - Example PDFs and outputs
 
-[Unreleased]: https://github.com/yourusername/pdf-flipbook-animator/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/pdf-flipbook-animator/releases/tag/v0.1.0
+[Unreleased]: https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/releases/tag/v0.1.0

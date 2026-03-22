@@ -1,4 +1,4 @@
-# Installation
+﻿# Installation
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ For development or to get the latest unreleased features:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pdf-flipbook-animator.git
+git clone https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial.git
 cd pdf-flipbook-animator
 
 # Install in development mode
@@ -34,7 +34,7 @@ Check that the installation was successful:
 pdf-flipbook --version
 ```
 
-You should see the version number (e.g., `0.1.0`).
+You should see the version number (e.g., `0.2.0`).
 
 ## Dependencies
 
@@ -103,8 +103,8 @@ If PyMuPDF fails to install, you may need to install system dependencies:
 
 ### Still Having Issues?
 
-- Check the [GitHub Issues](https://github.com/yourusername/pdf-flipbook-animator/issues)
-- Ask in [Discussions](https://github.com/yourusername/pdf-flipbook-animator/discussions)
+- Check the [GitHub Issues](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/issues)
+- Ask in [Discussions](https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial/discussions)
 
 ## Next Steps
 

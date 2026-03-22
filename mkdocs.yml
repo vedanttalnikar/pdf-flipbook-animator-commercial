@@ -1,8 +1,8 @@
-site_name: PDF Flipbook Animator
+﻿site_name: PDF Flipbook Animator
 site_description: Convert PDFs to animated flipbook web pages with realistic page-turning effects
-site_url: https://yourusername.github.io/pdf-flipbook-animator
-repo_url: https://github.com/yourusername/pdf-flipbook-animator
-repo_name: yourusername/pdf-flipbook-animator
+site_url: https://vedanttalnikar.github.io/pdf-flipbook-animator-commercial
+repo_url: https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial
+repo_name: vedanttalnikar/pdf-flipbook-animator-commercial
 edit_uri: edit/main/docs/
 
 theme:
@@ -91,7 +91,7 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/yourusername/pdf-flipbook-animator
+      link: https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/pdf-flipbook-animator/
   version:

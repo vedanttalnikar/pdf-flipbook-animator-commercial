@@ -1,4 +1,4 @@
-# Commercial Deployment Guide
+﻿# Commercial Deployment Guide
 
 ## Repository Setup (Private)
 
@@ -14,7 +14,7 @@
 
 ```bash
 # Add remote
-git remote add origin https://github.com/YOUR-USERNAME/pdf-flipbook-animator-commercial.git
+git remote add origin https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial.git
 
 # Push code
 git branch -M main
@@ -138,7 +138,7 @@ def activate(license_key: str):
         click.echo("✅ License activated successfully!")
     else:
         click.echo("❌ Invalid license key. Please check and try again.")
-        click.echo("Need help? Contact support@pdf-flipbook-animator.com")
+        click.echo("Need help? Contact vedanttalnikar@gmail.com")
 ```
 
 ## Marketing & Sales
@@ -162,7 +162,7 @@ def activate(license_key: str):
 ## Support Infrastructure
 
 ### Customer Support
-- Email: support@pdf-flipbook-animator.com
+- Email: vedanttalnikar@gmail.com
 - Documentation: docs.pdf-flipbook-animator.com
 - FAQ page
 - Issue tracking via private repo
@@ -252,5 +252,5 @@ Update website with:
 ---
 
 **Contact for Implementation Support**:
-- Repository: https://github.com/YOUR-USERNAME/pdf-flipbook-animator-commercial
-- Email: dev@pdf-flipbook-animator.com
+- Repository: https://github.com/vedanttalnikar/pdf-flipbook-animator-commercial
+- Email: vedanttalnikar@gmail.com

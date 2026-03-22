@@ -1,4 +1,4 @@
-[build-system]
+﻿[build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "Proprietary"}
 authors = [
-    {name = "PDF Flipbook Animator", email = "support@pdf-flipbook-animator.com"}
+    {name = "Vedant Talnikar", email = "vedanttalnikar@gmail.com"}
 ]
 keywords = ["pdf", "flipbook", "animation", "3d", "realistic", "page-turning", "commercial"]
 classifiers = [
